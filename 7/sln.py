@@ -10,7 +10,10 @@ def call_if_needed(s):
         return s
     return '{}()'.format(fix_name(s))
 
-def to_code(tokens, func_name):
+def to_code(tokens, func_name, substitutions):
+    if func_name in substitutions:
+        return substitutions[func_name]
+
     if len(tokens) == 1:
         return call_if_needed(tokens[0])
 
@@ -29,7 +32,7 @@ def to_code(tokens, func_name):
 program_template = '''
 cache = {{}}
 {body}
-print A()
+A()
 '''
 
 wire_template = '''
@@ -41,11 +44,22 @@ def {func_name}():
     return ans
 '''
 
-program_body = ''
-for line in sys.stdin:
-    tokens = line.strip().split()
-    func_name = fix_name(tokens[-1])
-    code = to_code(tokens[:-2], func_name)
-    program_body += wire_template.format(func_name=func_name, code=code)
+def generate_program(lines, substitutions):
+    program_body = ''
+    for line in lines:
+        tokens = line.strip().split()
+        func_name = fix_name(tokens[-1])
+        code = to_code(tokens[:-2], func_name, substitutions)
+        program_body += wire_template.format(func_name=func_name, code=code)
+    program = program_template.format(body=program_body)
+    return program
 
-exec(program_template.format(body=program_body))
+lines = sys.stdin.readlines()
+
+exec generate_program(lines, {})
+easy_answer = A()
+print easy_answer
+
+exec generate_program(lines, {'B': str(easy_answer)})
+hard_answer = A()
+print hard_answer
