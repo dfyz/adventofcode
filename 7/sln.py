@@ -2,6 +2,7 @@ import string
 import sys
 
 BIT_COUNT = 16
+solve_hard = True
 
 def to_bit_string(num):
     return bin(num)[2:].rjust(BIT_COUNT, '0')
@@ -38,8 +39,10 @@ def call_if_needed(s):
         return s
     return '{}()'.format(fix_name(s))
 
-def to_code(tokens):
+def to_code(tokens, func_name):
     if len(tokens) == 1:
+        if solve_hard and func_name == 'B':
+            return '956'
         return call_if_needed(tokens[0])
 
     if len(tokens) == 2:
@@ -62,7 +65,7 @@ for line in sys.stdin:
     program_lines.append('def {}():'.format(func_name))
     program_lines.append('  global cache')
     program_lines.append('  if "{0}" in cache: return cache["{0}"]'.format(func_name))
-    program_lines.append('  ans = {}'.format(to_code(tokens[:-2])))
+    program_lines.append('  ans = {}'.format(to_code(tokens[:-2], func_name)))
     program_lines.append('  cache["{}"] = ans'.format(func_name))
     program_lines.append('  return ans')
 
