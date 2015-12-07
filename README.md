@@ -21,3 +21,7 @@ Day 5
 Day 6
 -----
 I wonder if you can do better than `O(NUMBER_OF_QUERIES * NUMBER_OF_LIGHTS)`: [easy](https://github.com/dfyz/adventofcode/blob/master/6/sln.py), [hard](https://github.com/dfyz/adventofcode/blob/master/6/sln_hard.py).
+
+Day 7
+-----
+Code generation + memoization: [one solution](https://github.com/dfyz/adventofcode/blob/master/7/sln.py) for both easy and hard.
