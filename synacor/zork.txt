@@ -1,0 +1,77 @@
+go doorway
+go north
+go north
+go bridge
+continue
+go down
+go east
+take empty lantern
+go west
+go west
+go passage
+go ladder
+go west
+go south
+go north
+take can
+go west
+use can
+use lantern
+go ladder
+go darkness
+continue
+go west
+go west
+go west
+go west
+go north
+take red coin
+go north
+go east
+take concave coin
+go down
+take corroded coin
+go up
+go west
+go west
+take blue coin
+go up
+take shiny coin
+go down
+go east
+use blue coin
+use red coin
+use shiny coin
+use concave coin
+use corroded coin
+go north
+take teleporter
+use teleporter
+go west
+go north
+go north
+go north
+go north
+go north
+go north
+go north
+go north
+go north
+take orb
+go north
+go east
+go east
+go north
+go west
+go south
+go east
+go east
+go west
+go north
+go north
+go east
+go vault
+take mirror
+look mirror
+use mirror
+leave
