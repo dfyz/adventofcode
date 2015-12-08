@@ -25,3 +25,7 @@ I wonder if you can do better than `O(NUMBER_OF_QUERIES * NUMBER_OF_LIGHTS)`: [e
 Day 7
 -----
 Code generation + memoization: [one solution](https://github.com/dfyz/adventofcode/blob/master/7/sln.py) for both easy and hard.
+
+Day 8
+-----
+I can't escape: [one solution](https://github.com/dfyz/adventofcode/blob/master/8/sln.py) for both easy and hard.
