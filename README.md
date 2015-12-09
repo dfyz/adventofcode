@@ -29,3 +29,7 @@ Code generation + memoization: [one solution](https://github.com/dfyz/adventofco
 Day 8
 -----
 I can't escape: [one solution](https://github.com/dfyz/adventofcode/blob/master/8/sln.py) for both easy and hard.
+
+Day 9
+-----
+`itertools.permutations()` + brute force: [solution](https://github.com/dfyz/adventofcode/blob/master/9/sln.py).
