@@ -36,4 +36,4 @@ Day 9
 
 Day 10
 ------
-Stepping up the game: a [solution](https://github.com/dfyz/adventofcode/blob/master/10/sln.py) in [K](https://en.wikipedia.org/wiki/K_(programming_language)) (use [Kona](https://github.com/kevinlawler/kona) to run it).
+Stepping up the game: a [solution](https://github.com/dfyz/adventofcode/blob/master/10/sln.k) in [K](https://en.wikipedia.org/wiki/K_(programming_language)) (use [Kona](https://github.com/kevinlawler/kona) to run it).
