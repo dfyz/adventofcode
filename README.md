@@ -33,3 +33,7 @@ I can't escape: [one solution](https://github.com/dfyz/adventofcode/blob/master/
 Day 9
 -----
 `itertools.permutations()` + brute force: [solution](https://github.com/dfyz/adventofcode/blob/master/9/sln.py).
+
+Day 10
+------
+Stepping up the game: a [solution](https://github.com/dfyz/adventofcode/blob/master/9/sln.py) in [K](https://en.wikipedia.org/wiki/K_(programming_language)) (use [Kona](https://github.com/kevinlawler/kona) to run it).
