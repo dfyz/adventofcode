@@ -45,3 +45,7 @@ A [solution](https://github.com/dfyz/adventofcode/blob/master/11/sln.cbl) in COB
 Day 12
 ------
 I was too lazy to implement a JSON parser in a non-trivial language, hence [Python again](https://github.com/dfyz/adventofcode/blob/master/12/sln.py).
+
+Day 13
+------
+Pretty much identical to day #9: [solution in Python](https://github.com/dfyz/adventofcode/blob/master/13/sln.py).
