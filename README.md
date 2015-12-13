@@ -41,3 +41,7 @@ Stepping up the game: a [solution](https://github.com/dfyz/adventofcode/blob/mas
 Day 11
 ------
 A [solution](https://github.com/dfyz/adventofcode/blob/master/11/sln.cbl) in COBOL! Compiles and runs at least with [GNUCobol](http://sourceforge.net/projects/open-cobol/), should probably work with other compilers.
+
+Day 12
+------
+I was too lazy to implement a JSON parser in a non-trivial language, hence [Python again](https://github.com/dfyz/adventofcode/blob/master/12/sln.py).
