@@ -49,3 +49,7 @@ I was too lazy to implement a JSON parser in a non-trivial language, hence [Pyth
 Day 13
 ------
 Pretty much identical to day #9: [solution in Python](https://github.com/dfyz/adventofcode/blob/master/13/sln.py).
+
+Day 14
+------
+Finally, a somewhat tricky problem: [solution](https://github.com/dfyz/adventofcode/blob/master/14/sln.py).
