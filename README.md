@@ -53,3 +53,7 @@ Pretty much identical to day #9: [solution in Python](https://github.com/dfyz/ad
 Day 14
 ------
 Finally, a somewhat tricky problem: [solution](https://github.com/dfyz/adventofcode/blob/master/14/sln.py).
+
+Day 15
+------
+Brute force continues: [solution](https://github.com/dfyz/adventofcode/blob/master/15/sln.py).
