@@ -57,3 +57,7 @@ Finally, a somewhat tricky problem: [solution](https://github.com/dfyz/adventofc
 Day 15
 ------
 Brute force continues: [solution](https://github.com/dfyz/adventofcode/blob/master/15/sln.py).
+
+Day 16
+------
+The last easy puzzle, according to the author: [solution](https://github.com/dfyz/adventofcode/blob/master/16/sln.py).
