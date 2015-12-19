@@ -61,3 +61,7 @@ Brute force continues: [solution](https://github.com/dfyz/adventofcode/blob/mast
 Day 16
 ------
 The last easy puzzle, according to the author: [solution](https://github.com/dfyz/adventofcode/blob/master/16/sln.py).
+
+Day 17
+------
+Dynamic programming + `import numpy`: [solution](https://github.com/dfyz/adventofcode/blob/master/17/sln.py).
