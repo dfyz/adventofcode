@@ -65,3 +65,7 @@ The last easy puzzle, according to the author: [solution](https://github.com/dfy
 Day 17
 ------
 Dynamic programming + `import numpy`: [solution](https://github.com/dfyz/adventofcode/blob/master/17/sln.py).
+
+Day 18
+------
+Classic Game of Life: [solution](https://github.com/dfyz/adventofcode/blob/master/18/sln.py).
