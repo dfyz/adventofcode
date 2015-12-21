@@ -69,3 +69,11 @@ Dynamic programming + `import numpy`: [solution](https://github.com/dfyz/advento
 Day 18
 ------
 Classic Game of Life: [solution](https://github.com/dfyz/adventofcode/blob/master/18/sln.py).
+
+Day 19
+------
+The hardest puzzle so far: [easy](https://github.com/dfyz/adventofcode/blob/master/19/sln_easy.py), [hard](https://github.com/dfyz/adventofcode/blob/master/19/sln_hard.py).
+
+Day 20
+------
+A naive O(n*sqrt(n)) [solution](https://github.com/dfyz/adventofcode/blob/master/20/sln.py).
