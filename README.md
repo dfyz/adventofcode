@@ -77,3 +77,7 @@ The hardest puzzle so far: [easy](https://github.com/dfyz/adventofcode/blob/mast
 Day 20
 ------
 A naive O(n*sqrt(n)) [solution](https://github.com/dfyz/adventofcode/blob/master/20/sln.py).
+
+Day 21
+------
+`itertools` [magic](https://github.com/dfyz/adventofcode/blob/master/21/sln.py).
