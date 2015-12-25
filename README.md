@@ -93,3 +93,7 @@ I'm all [out of witty comments](https://github.com/dfyz/adventofcode/blob/master
 Day 24
 ------
 [Solution](https://github.com/dfyz/adventofcode/blob/master/24/sln.py).
+
+Day 25
+------
+[Merry Christmas!](https://github.com/dfyz/adventofcode/blob/master/25/sln.py)
