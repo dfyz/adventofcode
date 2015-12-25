@@ -89,3 +89,7 @@ I hate [games](https://github.com/dfyz/adventofcode/blob/master/22/sln.py).
 Day 23
 ------
 I'm all [out of witty comments](https://github.com/dfyz/adventofcode/blob/master/23/sln.py).
+
+Day 24
+------
+[Solution](https://github.com/dfyz/adventofcode/blob/master/24/sln.py).
