@@ -81,3 +81,11 @@ A naive O(n*sqrt(n)) [solution](https://github.com/dfyz/adventofcode/blob/master
 Day 21
 ------
 `itertools` [magic](https://github.com/dfyz/adventofcode/blob/master/21/sln.py).
+
+Day 22
+------
+I hate [games](https://github.com/dfyz/adventofcode/blob/master/22/sln.py).
+
+Day 23
+------
+I'm all [out of witty comments](https://github.com/dfyz/adventofcode/blob/master/23/sln.py).
