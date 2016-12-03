@@ -30,3 +30,6 @@ parseInstructions = (map parseOneIns) . (T.splitOn (T.pack ", "))
     where
         parseOneIns t = Instruction (T.head t) (read $ T.unpack $ T.tail t)
 
+rotate :: Char -> VectorZipper -> VectorZipper
+rotate 'L' = goLeft
+rotate 'R' = goRight

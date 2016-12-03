@@ -14,8 +14,6 @@ doAllMoves = fst . (foldl doInstruction ((0, 0), directions))
         doInstruction (p, vz) (Instruction rot sc) =
             let rotated = rotate rot vz in
             (doOneMove p (head $ fst rotated) sc, rotated)
-        rotate 'L' = goLeft
-        rotate 'R' = goRight
 
 solve :: T.Text -> Int
 solve = taxicab . doAllMoves . parseInstructions
