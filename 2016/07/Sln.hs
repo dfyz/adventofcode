@@ -1,5 +1,7 @@
 import Control.Applicative
+import Data.List
 import Data.Maybe
+import Data.Tuple
 import Test.Hspec
 import Text.Trifecta
 
@@ -17,6 +19,16 @@ parseIPv7 = fromSuccess . (parseString (IPv7 <$> some tk) mempty)
         letters = some lower
         tk = (OutsideBrackets <$> letters) <|> (InsideBrackets <$> between (char '[') (char ']') letters)
 
+insides = mapMaybe inside
+    where
+        inside (InsideBrackets x) = Just x
+        inside _ = Nothing
+
+outsides = mapMaybe outside
+    where
+        outside (OutsideBrackets x) = Just x
+        outside _ = Nothing
+
 hasAbba :: String -> Bool
 hasAbba lst@(a:b:c:d:_) = isGoodQuadruplet || (hasAbba $ tail lst)
     where
@@ -24,27 +36,47 @@ hasAbba lst@(a:b:c:d:_) = isGoodQuadruplet || (hasAbba $ tail lst)
 hasAbba _ = False
 
 hasTls :: IPv7 -> Bool
-hasTls (IPv7 parts) = (any hasAbba (mapMaybe outside parts)) && (all (not . hasAbba) (mapMaybe inside parts))
+hasTls (IPv7 parts) = (any hasAbba (outsides parts)) && (all (not . hasAbba) (insides parts))
+
+collectAbas :: String -> [(Char, Char)]
+collectAbas = mapMaybe extractAba . tails
     where
-        inside (InsideBrackets x) = Just x
-        inside _ = Nothing
-        outside (OutsideBrackets x) = Just x
-        outside _ = Nothing
+        extractAba (a:b:c:_)
+            | (a == c) && (a /= b) = Just (a, b)
+            | otherwise = Nothing
+        extractAba _ = Nothing
+
+hasSsl :: IPv7 -> Bool
+hasSsl (IPv7 parts) = not $ null $ intersect (concatMap collectAbas (outsides parts)) (swap <$> concatMap collectAbas (insides parts)) 
 
 main = do
     hspec $ do
         describe "hasTls" $ do
             it "sample #1" $ do
-                "abba[mnop]qrst" `shouldSatisfy` parseAndCheck
+                "abba[mnop]qrst" `shouldSatisfy` parseAndCheckTls
             it "sample #2" $ do
-                "abcd[bddb]xyyx" `shouldNotSatisfy` parseAndCheck
+                "abcd[bddb]xyyx" `shouldNotSatisfy` parseAndCheckTls
             it "sample #3" $ do
-                "aaaa[qwer]tyui" `shouldNotSatisfy` parseAndCheck
+                "aaaa[qwer]tyui" `shouldNotSatisfy` parseAndCheckTls
             it "sample #4" $ do
-                "ioxxoj[asdfgh]zxcvbn" `shouldSatisfy` parseAndCheck
+                "ioxxoj[asdfgh]zxcvbn" `shouldSatisfy` parseAndCheckTls
 
-    solveEasy >>= print
+        describe "hasSsl" $ do
+            it "sample #1" $ do
+                "aba[bab]xyz" `shouldSatisfy` parseAndCheckSsl
+            it "sample #2" $ do
+                "xyx[xyx]xyx" `shouldNotSatisfy` parseAndCheckSsl
+            it "sample #3" $ do
+                "aaa[kek]eke" `shouldSatisfy` parseAndCheckSsl
+            it "sample #4" $ do
+                "zazbz[bzb]cdb" `shouldSatisfy` parseAndCheckSsl
+
+
+    ls <- lines <$> getContents
+    print $ count parseAndCheckTls ls
+    print $ count parseAndCheckSsl ls
 
     where
-        parseAndCheck = hasTls . parseIPv7
-        solveEasy = (length . filter parseAndCheck) <$> lines <$> getContents
+        parseAndCheckTls = hasTls . parseIPv7
+        parseAndCheckSsl = hasSsl . parseIPv7
+        count pred = length . filter pred
