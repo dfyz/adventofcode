@@ -25,11 +25,7 @@ fun killNext(killer: Node): Node {
 }
 
 fun solveEasy(start: Node, n: Int): Int {
-    var cur = start
-    repeat(times = n - 1) {
-        cur = killNext(cur)
-    }
-    return cur.num
+    return generateSequence(start) { killNext(it) }.take(n).last().num
 }
 
 fun killCur(toKill: Node, stepTwice: Boolean): Node {
@@ -41,11 +37,8 @@ fun killCur(toKill: Node, stepTwice: Boolean): Node {
 }
 
 fun solveHard(start: Node, n: Int): Int {
+    var toKill = generateSequence(start) { it.next }.take(n / 2 + 1).last()
     var cur = start
-    var toKill = start
-    repeat(times = n/2) {
-        toKill = toKill.next
-    }
     for (length in n downTo 2) {
         toKill = killCur(toKill, length % 2 == 1)
         cur = cur.next
