@@ -17,7 +17,7 @@
    "[1518-11-05 00:45] falls asleep"
    "[1518-11-05 00:55] wakes up"])
 
-(def input (clojure.string/split-lines (slurp "04\\input.txt")))
+(def input (clojure.string/split-lines (slurp "inputs\\04.txt")))
 
 (defn parse-event [event]
   (case event

@@ -4,7 +4,7 @@
     {:num num :x x :y y :w w :h h}))
 
 (def sample (map parse-claim ["#1 @ 1,3: 4x4" "#2 @ 3,1: 4x4" "#3 @ 5,5: 2x2"]))
-(def input (map parse-claim (clojure.string/split-lines (slurp "03/input.txt"))))
+(def input (map parse-claim (clojure.string/split-lines (slurp "inputs\\03.txt"))))
 
 (defn to-cells [claim]
   (letfn [(to-range [x len] (range x (+ x len)))]

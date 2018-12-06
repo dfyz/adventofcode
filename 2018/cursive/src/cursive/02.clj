@@ -1,5 +1,5 @@
 (def sample ["abcdef" "bababc" "abbcde" "abcccd" "aabcdd" "abcdee" "ababab"])
-(def inp (clojure.string/split-lines (slurp "02\\input.txt")))
+(def inp (clojure.string/split-lines (slurp "inputs\\02.txt")))
 
 (defn counted [inp] (map frequencies inp))
 
