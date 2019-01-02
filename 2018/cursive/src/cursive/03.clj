@@ -34,4 +34,4 @@
 (->> input
      (filter #(empty? (clojure.set/intersection dup-set (set (to-cells %)))))
      first
-    :num)
+     :num)

@@ -20,9 +20,9 @@
 
 (defn hard-answer [data]
   (apply min
-    (map
-      #(easy-answer (remove #{(Character/toUpperCase %) (Character/toLowerCase %)} data))
-      (set data))))
+         (map
+           #(easy-answer (remove #{(Character/toUpperCase %) (Character/toLowerCase %)} data))
+           (set data))))
 
 (easy-answer input)
 (hard-answer input)

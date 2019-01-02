@@ -22,15 +22,15 @@
 (defn parse-event [event]
   (case event
     "falls asleep" :asleep
-    "wakes up"     :awake
+    "wakes up" :awake
     (Integer/parseInt (second (re-find #"(\d+)" event)))))
 
 (defn parse-line [line]
   (let [groups
         (re-find #"\[(\d+)-(\d+)-(\d+) (\d+):(\d+)\] (.*)$" line)]
     (conj
-     (map #(Integer/parseInt %) (drop-last (rest groups)))
-     (parse-event (last groups)))))
+      (map #(Integer/parseInt %) (drop-last (rest groups)))
+      (parse-event (last groups)))))
 
 (defn parse-input [input]
   (->> input
@@ -57,9 +57,9 @@
 
 (defn find-asleep-minutes [data]
   (loop [cur-id nil
-        prev-line nil
-        lst data
-        state {}]
+         prev-line nil
+         lst data
+         state {}]
     (let [cur-line (first lst)
           new-state (update-state state prev-line cur-line cur-id)]
       (if (empty? (rest lst))
@@ -69,9 +69,9 @@
 
 (defn easy-answer [data]
   (let [best-guard
-          (apply max-key #(apply + (vals (val %))) (find-asleep-minutes data))]
+        (apply max-key #(apply + (vals (val %))) (find-asleep-minutes data))]
     (let [best-minute
-            (first (apply max-key #(val %) (val best-guard)))]
+          (first (apply max-key #(val %) (val best-guard)))]
       (* (first best-guard) best-minute))))
 
 (easy-answer parsed-input)
