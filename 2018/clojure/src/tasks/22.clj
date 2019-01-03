@@ -1,3 +1,5 @@
+(ns tasks.22)
+
 (defn read-input [filename]
   (let [content (slurp filename)]
     (vec (map #(Integer/parseInt %) (drop 1 (re-find #"depth: (\d+)\ntarget: (\d+),(\d+)" content))))))

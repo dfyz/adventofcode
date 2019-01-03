@@ -1,3 +1,6 @@
+(ns tasks.25
+  (:require [clojure.set]))
+
 (defn parse-nums [tokens]
   (vec (map #(Integer/parseInt %) tokens)))
 
@@ -40,7 +43,7 @@
                                          (find-constellation x (conj members x) graph)))]
         (recur members xs)))))
 
-(defn solve [input]
+(defn solve-easy [input]
   (let [graph (to-graph input)]
     (loop [left (set (range (count graph)))
            constellation-count 0]

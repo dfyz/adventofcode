@@ -1,3 +1,5 @@
+(ns tasks.16)
+
 (defn parse-desc [desc]
   (->> desc
        (re-find #"\[(\d+), (\d+), (\d+), (\d+)\]$")
@@ -91,7 +93,7 @@
                        (fn [[op-num a b c]]
                          (vector (assignments op-num) a b c))
                        hard-part)]
-    (reduce
-      (fn [state [op a b c]] ((ops op) state (vector nil a b c)))
-      [0 0 0 0]
-      instructions)))
+    (first (reduce
+             (fn [state [op a b c]] ((ops op) state (vector nil a b c)))
+             [0 0 0 0]
+             instructions))))

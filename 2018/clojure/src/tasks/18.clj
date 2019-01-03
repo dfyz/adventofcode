@@ -1,3 +1,5 @@
+(ns tasks.18)
+
 (def input (vec (map vec (clojure.string/split-lines (slurp "inputs\\18.txt")))))
 
 (defn g [data row col]

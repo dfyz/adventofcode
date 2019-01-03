@@ -1,3 +1,6 @@
+(ns tasks.20
+  (:require [clojure.set]))
+
 (defn parse-regex [pos input]
   (loop [pos pos
          alts []
@@ -116,5 +119,5 @@
                        to-graph
                        get-distances
                        vals)]
-    {:easy (apply max distances)
-     :hard (count (filter #(>= % 1000) distances))}))
+    [(apply max distances)
+     (count (filter #(>= % 1000) distances))]))

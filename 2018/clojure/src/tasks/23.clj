@@ -1,3 +1,5 @@
+(ns tasks.23)
+
 (defn parse-bot [line]
   (let [[_ x y z r] (re-find #"pos=<(-?\d+),(-?\d+),(-?\d+)>, r=(\d+)" line)]
     [(Integer/parseInt x)

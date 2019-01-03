@@ -1,4 +1,7 @@
-(def input (cursive.vm-utils/parse-input "inputs\\21.txt"))
+(ns tasks.21
+  (:require [tasks.vm-utils]))
+
+(def input (tasks.vm-utils/parse-input "inputs\\21.txt"))
 
 (defn rng-step [r1]
   (let [r4 (bit-or r1 65536)]
@@ -12,9 +15,9 @@
                 trunc #(bit-and % 16777215)]
             (trunc (* 65899 (trunc (+ r1 r4-low))))))))))
 
-(def solve-easy (rng-step 0))
+(defn solve-easy [_] (rng-step 0))
 
-(def solve-hard
+(defn solve-hard [_]
   (loop [cur 0 used #{}]
     (let [next (rng-step cur)]
       (if (contains? used next)

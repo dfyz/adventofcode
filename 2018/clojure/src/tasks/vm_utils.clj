@@ -1,4 +1,4 @@
-(ns cursive.vm-utils)
+(ns tasks.vm-utils)
 
 (defn parse-line [line]
   (let [[op a b c] (clojure.string/split line #" ")]
