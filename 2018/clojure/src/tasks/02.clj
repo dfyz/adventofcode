@@ -1,5 +1,7 @@
+(ns tasks.02)
+
 (def sample ["abcdef" "bababc" "abbcde" "abcccd" "aabcdd" "abcdee" "ababab"])
-(def inp (clojure.string/split-lines (slurp "inputs\\02.txt")))
+(def input (clojure.string/split-lines (slurp "inputs\\02.txt")))
 
 (defn counted [inp] (map frequencies inp))
 
@@ -10,8 +12,8 @@
   (count
     (filter #(is-good % n) fq)))
 
-(def easy
-  (let [cnt-inp (counted inp)]
+(defn solve-easy [input]
+  (let [cnt-inp (counted input)]
     (* (count-goods cnt-inp 2) (count-goods cnt-inp 3))))
 
 (defn is-good-pair [pair]
@@ -19,15 +21,14 @@
     (= 1
        (count (filter identity mismatches)))))
 
-(def good-pair
+(defn get-good-pair [input]
   (some
-    #(if (is-good-pair %) %
-                          (for [a inp b inp] [a b]))))
+    #(if (is-good-pair %) %)
+    (for [a input b input] [a b])))
 
-(def hard
-  (clojure.string/join
-    (map first
-         (filter #(= (first %) (second %))
-                 (map vector (first good-pair) (second good-pair))))))
-
-[easy hard]
+(defn solve-hard [input]
+  (let [good-pair (get-good-pair input)]
+    (clojure.string/join
+      (map first
+           (filter #(= (first %) (second %))
+                   (map vector (first good-pair) (second good-pair)))))))
