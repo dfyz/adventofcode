@@ -1,3 +1,6 @@
+(ns tasks.03
+  (:require [clojure.set]))
+
 (defn parse-claim [s]
   (let [groups (re-find #"#(\d+) @ (\d+),(\d+): (\d+)x(\d+)" s)
         [num x y w h] (map #(Integer/parseInt %) (drop 1 groups))]
@@ -17,7 +20,7 @@
        (map to-cells)
        (apply concat)))
 
-(defn dups [claims]
+(defn get-dups [claims]
   (->> claims
        all-cells
        frequencies
@@ -25,13 +28,14 @@
        (map key)
        set))
 
-(def dup-set (dups input))
+(defn dup-set [input] (get-dups input))
 
-; easy
-(count dup-set)
+(defn solve-easy [input]
+  (count (dup-set input)))
 
-; hard
-(->> input
-     (filter #(empty? (clojure.set/intersection dup-set (set (to-cells %)))))
-     first
-     :num)
+(defn solve-hard [input]
+  (let [dups (dup-set input)]
+    (->> input
+         (filter #(empty? (clojure.set/intersection dups (set (to-cells %)))))
+         first
+         :num)))
