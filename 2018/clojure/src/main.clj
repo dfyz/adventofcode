@@ -1,7 +1,7 @@
 (ns main)
 
-(defn print-answers [easy-answer hard-answer]
-  (println "\tEasy answer:" easy-answer)
+(defn print-answers [task-name easy-answer hard-answer]
+  (println "\tEasy answer:" (if (= task-name "10") (str "\n" easy-answer) easy-answer))
   (println "\tHard answer:" hard-answer))
 
 (defn -main [& args]
@@ -12,6 +12,6 @@
       (let [input (ns-resolve task-symbol 'input)]
         (case task-name
           "20" (apply print-answers ((ns-resolve task-symbol 'solve-both) @input))
-          "25" (print-answers ((ns-resolve task-symbol 'solve-easy) @input) "Merry Christmas!")
+          "25" (print-answers task-name ((ns-resolve task-symbol 'solve-easy) @input) "Merry Christmas!")
           (let [[easy hard] (map #(ns-resolve task-symbol %) ['solve-easy 'solve-hard])]
-            (print-answers (easy @input) (hard @input))))))))
+            (print-answers task-name (easy @input) (hard @input))))))))
