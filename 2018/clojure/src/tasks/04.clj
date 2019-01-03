@@ -1,4 +1,6 @@
-(def sample
+(ns tasks.04)
+
+(def raw-sample
   ["[1518-11-01 00:00] Guard #10 begins shift"
    "[1518-11-01 00:05] falls asleep"
    "[1518-11-01 00:25] wakes up"
@@ -17,7 +19,7 @@
    "[1518-11-05 00:45] falls asleep"
    "[1518-11-05 00:55] wakes up"])
 
-(def input (clojure.string/split-lines (slurp "inputs\\04.txt")))
+(def raw-input (clojure.string/split-lines (slurp "inputs\\04.txt")))
 
 (defn parse-event [event]
   (case event
@@ -37,8 +39,8 @@
        (map parse-line)
        (sort-by #(vec (drop 1 %)))))
 
-(def parsed-sample (parse-input sample))
-(def parsed-input (parse-input input))
+(def sample (parse-input raw-sample))
+(def input (parse-input raw-input))
 
 (defn update-with-minute [minutes m]
   (assoc minutes m (inc (get minutes m 0))))
@@ -67,16 +69,14 @@
         (let [new-id (if (integer? (first cur-line)) (first cur-line) cur-id)]
           (recur new-id cur-line (rest lst) new-state))))))
 
-(defn easy-answer [data]
+(defn solve-easy [data]
   (let [best-guard
         (apply max-key #(apply + (vals (val %))) (find-asleep-minutes data))]
     (let [best-minute
           (first (apply max-key #(val %) (val best-guard)))]
       (* (first best-guard) best-minute))))
 
-(easy-answer parsed-input)
-
-(defn hard-answer [data]
+(defn solve-hard [data]
   (letfn [(find-max-minute [minutes]
             (apply max-key val (val minutes)))]
     (let [best-guard
@@ -84,5 +84,3 @@
       (*
         (first best-guard)
         (first (find-max-minute best-guard))))))
-
-(hard-answer parsed-input)
