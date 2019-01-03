@@ -1,3 +1,5 @@
+(ns tasks.05)
+
 (def sample "dabAcCaCBAcCcaDA")
 (def input (clojure.string/trim-newline (slurp "inputs\\05.txt")))
 
@@ -16,13 +18,10 @@
         (recur xs (conj out ch))))))
 
 (defn react [data] (clojure.string/join (reverse (process-rec data ()))))
-(defn easy-answer [data] (count (react data)))
+(defn solve-easy [data] (count (react data)))
 
-(defn hard-answer [data]
+(defn solve-hard [data]
   (apply min
          (map
-           #(easy-answer (remove #{(Character/toUpperCase %) (Character/toLowerCase %)} data))
+           #(solve-easy (remove #{(Character/toUpperCase %) (Character/toLowerCase %)} data))
            (set data))))
-
-(easy-answer input)
-(hard-answer input)
