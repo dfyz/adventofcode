@@ -1,4 +1,4 @@
 (ns main)
 
-(defn -main [&args]
+(defn -main [& args]
   (println 42))

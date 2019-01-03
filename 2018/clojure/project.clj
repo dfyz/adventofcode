@@ -1,4 +1,4 @@
-(defproject cursive "0.1.0-SNAPSHOT"
+(defproject clojure "0.1.0-SNAPSHOT"
   :description "Advent of Code 2018 solutions"
   :main main
   ; Downloaded from https://github.com/Z3Prover/z3/releases/tag/z3-4.8.4
