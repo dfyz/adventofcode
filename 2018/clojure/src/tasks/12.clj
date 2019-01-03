@@ -1,3 +1,5 @@
+(ns tasks.12)
+
 (defn to-plants [state]
   (->> state
        (map-indexed vector)
@@ -29,10 +31,10 @@
                          (apply sorted-set))]
     (vector next-plants patterns)))
 
-(defn solve-easy [data iters]
+(defn solve-easy [data]
   (apply +
          (first (last
-                  (take (inc iters) (iterate step data))))))
+                  (take (inc 20) (iterate step data))))))
 
 (defn normalize-plants [plants]
   (let [min-plant (apply min plants)
@@ -42,13 +44,13 @@
 (defn find-stable-state [data]
   (let [pairs (partition 2 1 (iterate step data))
         [iter-num [[p1 _] _]] (first (drop-while
-                                       (fn [[idx [[p1 _] [p2 _]]]] (not=
-                                                                     (second (normalize-plants p1))
-                                                                     (second (normalize-plants p2))))
+                                       (fn [[_ [[p1 _] [p2 _]]]] (not=
+                                                                   (second (normalize-plants p1))
+                                                                   (second (normalize-plants p2))))
                                        (map-indexed vector pairs)))]
     (vector (- iter-num (first p1)) (second (normalize-plants p1)))))
 
-(defn solve-hard [data iters]
+(defn solve-hard [data]
   (let [[iter-diff normalized] (find-stable-state data)
-        first-num (- iters iter-diff)]
+        first-num (- 50000000000 iter-diff)]
     (apply + (map #(+ first-num %) normalized))))
