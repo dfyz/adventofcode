@@ -1,11 +1,16 @@
-(def sample ["1, 1" "1, 6" "8, 3" "3, 4" "5, 5" "8, 9"])
-(def input (clojure.string/split-lines (slurp "inputs\\06.txt")))
+(ns tasks.06)
+
+(def raw-sample ["1, 1" "1, 6" "8, 3" "3, 4" "5, 5" "8, 9"])
+(def raw-input (clojure.string/split-lines (slurp "inputs\\06.txt")))
 
 (defn parse-input [lines]
   (->> lines
        (map #(clojure.string/split % #", "))
        (map
          #(map (fn [x] (Integer/parseInt x)) %))))
+
+(def sample (parse-input raw-sample))
+(def input (parse-input raw-input))
 
 (defn distance [p1 p2]
   (let [diff (fn [c1 c2] (Math/abs (- c1 c2)))]
