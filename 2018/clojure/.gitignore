@@ -4,6 +4,6 @@
 *.jar
 *.class
 /.lein-*
-/.nrepl-port/
-/.idea
-/clojure.iml
+/.nrepl-port
+.idea
+clojure.iml
