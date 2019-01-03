@@ -1,3 +1,7 @@
+(ns tasks.11)
+
+(def input 9995)
+
 (def field-size 300)
 
 (defn power-level [x y sn]
@@ -14,9 +18,12 @@
   (let [squares (for [xx (range x (+ x 3)) yy (range y (+ y 3))] [xx yy])]
     (apply + (map #(power-level (first %) (second %) sn) squares))))
 
+(defn to-answer [nums]
+  (clojure.string/join #"," nums))
+
 (defn solve-easy [sn]
   (let [cands (for [x (range 1 (dec field-size)) y (range 1 (dec field-size))] [x y])]
-    (apply max-key #(square-power-level (first %) (second %) sn) cands)))
+    (to-answer (apply max-key #(square-power-level (first %) (second %) sn) cands))))
 
 (defn cum-sum [x y sn]
   (if (or (<= x 0) (<= y 0))
@@ -48,7 +55,7 @@
                                     (- (inc field-size) x)
                                     (- (inc field-size) y)))]
                 [x y size])]
-    (apply
-      max-key
-      (fn [[x y sz]] (square-sum x y sz sn))
-      cands)))
+    (to-answer (apply
+                 max-key
+                 (fn [[x y sz]] (square-sum x y sz sn))
+                 cands))))

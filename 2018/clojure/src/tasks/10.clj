@@ -1,3 +1,5 @@
+(ns tasks.10)
+
 (defn parse-input [filename]
   (let [content (clojure.string/split-lines (slurp filename))]
     (->> content
