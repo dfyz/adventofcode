@@ -1,4 +1,5 @@
-(require '[clojure.data.finger-tree :as ft])
+(ns tasks.09
+  (:require [clojure.data.finger-tree :as ft]))
 
 (defn step-simple [nums idx next-marble]
   (let [split-pos (rem (inc idx) (count nums))
