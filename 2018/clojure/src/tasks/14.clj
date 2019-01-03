@@ -1,3 +1,7 @@
+(ns tasks.14)
+
+(def input "652601")
+
 (defn combine [nums x y]
   (let [sum (+ x y)
         little (rem sum 10)

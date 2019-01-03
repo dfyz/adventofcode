@@ -1,3 +1,5 @@
+(ns tasks.13)
+
 (defn read-input [filename]
   (let [lines (vec (map vec (clojure.string/split-lines (slurp filename))))]
     lines))
