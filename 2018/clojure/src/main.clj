@@ -11,7 +11,7 @@
       (require [task-symbol])
       (let [input (ns-resolve task-symbol 'input)]
         (case task-name
-          "20" (apply print-answers ((ns-resolve task-symbol 'solve-both) @input))
+          ("17" "20") (apply print-answers task-name ((ns-resolve task-symbol 'solve-both) @input))
           "25" (print-answers task-name ((ns-resolve task-symbol 'solve-easy) @input) "Merry Christmas!")
           (let [[easy hard] (map #(ns-resolve task-symbol %) ['solve-easy 'solve-hard])]
             (print-answers task-name (easy @input) (hard @input))))))))
