@@ -1,7 +1,7 @@
 (ns tasks.02)
 
 (def sample ["abcdef" "bababc" "abbcde" "abcccd" "aabcdd" "abcdee" "ababab"])
-(def input (clojure.string/split-lines (slurp "inputs\\02.txt")))
+(def input (clojure.string/split-lines (slurp "inputs/02.txt")))
 
 (defn counted [inp] (map frequencies inp))
 

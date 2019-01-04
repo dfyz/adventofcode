@@ -1,8 +1,8 @@
 (ns tasks.19
   (:require [tasks.vm-utils]))
 
-(def sample (tasks.vm-utils/parse-input "inputs\\19_sample.txt"))
-(def input (tasks.vm-utils/parse-input "inputs\\19.txt"))
+(def sample (tasks.vm-utils/parse-input "inputs/19_sample.txt"))
+(def input (tasks.vm-utils/parse-input "inputs/19.txt"))
 
 (defn simulate [input start-regs max-iter]
   (loop [ip 0

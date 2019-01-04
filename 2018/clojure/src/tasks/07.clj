@@ -8,7 +8,7 @@
              "Step D must be finished before step E can begin."
              "Step F must be finished before step E can begin."])
 
-(def input (clojure.string/split-lines (slurp "inputs\\07.txt")))
+(def input (clojure.string/split-lines (slurp "inputs/07.txt")))
 
 (defn parse-input [lines]
   (map

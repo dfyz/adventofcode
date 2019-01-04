@@ -1,7 +1,7 @@
 (ns tasks.06)
 
 (def raw-sample ["1, 1" "1, 6" "8, 3" "3, 4" "5, 5" "8, 9"])
-(def raw-input (clojure.string/split-lines (slurp "inputs\\06.txt")))
+(def raw-input (clojure.string/split-lines (slurp "inputs/06.txt")))
 
 (defn parse-input [lines]
   (->> lines

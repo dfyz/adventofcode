@@ -33,8 +33,8 @@
         hard (read-hard content)]
     (vector easy hard)))
 
-(def sample (read-input "inputs\\16_sample.txt"))
-(def input (read-input "inputs\\16.txt"))
+(def sample (read-input "inputs/16_sample.txt"))
+(def input (read-input "inputs/16.txt"))
 
 (defn apply-op [f a-type b-type nums [_ a b c]]
   (let [fetch (fn [type val] (if (= type :imm) val (get nums val)))

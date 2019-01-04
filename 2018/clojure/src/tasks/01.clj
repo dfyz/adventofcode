@@ -1,6 +1,6 @@
 (ns tasks.01)
 
-(def input (map #(Integer/parseInt %) (clojure.string/split-lines (slurp "inputs\\01.txt"))))
+(def input (map #(Integer/parseInt %) (clojure.string/split-lines (slurp "inputs/01.txt"))))
 
 (defn solve-easy [nums] (reduce #(+ %1 %2) nums))
 

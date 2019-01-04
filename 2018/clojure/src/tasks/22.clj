@@ -5,7 +5,7 @@
     (vec (map #(Integer/parseInt %) (drop 1 (re-find #"depth: (\d+)\ntarget: (\d+),(\d+)" content))))))
 
 (def sample [510 10 10])
-(def input (read-input "inputs\\22.txt"))
+(def input (read-input "inputs/22.txt"))
 
 (def switch-time 7)
 (def field-gap 30)

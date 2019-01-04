@@ -11,9 +11,9 @@
   (let [lines (clojure.string/split-lines (slurp filename))]
     (map parse-bot lines)))
 
-(def sample (parse-input "inputs\\23_sample.txt"))
-(def sample-1 (parse-input "inputs\\23_sample1.txt"))
-(def input (parse-input "inputs\\23.txt"))
+(def sample (parse-input "inputs/23_sample.txt"))
+(def sample-1 (parse-input "inputs/23_sample1.txt"))
+(def input (parse-input "inputs/23.txt"))
 
 (defn d [c1 c2] (Math/abs (- c1 c2)))
 

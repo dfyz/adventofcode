@@ -32,9 +32,9 @@
 (defn parse-input [filename]
   (collect-carts (read-input filename)))
 
-(def sample (parse-input "inputs\\13_sample.txt"))
-(def sample-hard (parse-input "inputs\\13_sample_hard.txt"))
-(def input (parse-input "inputs\\13.txt"))
+(def sample (parse-input "inputs/13_sample.txt"))
+(def sample-hard (parse-input "inputs/13_sample_hard.txt"))
+(def input (parse-input "inputs/13.txt"))
 
 (def memory-cycle [:left :straight :right])
 (def state-cycle [\> \v \< \^])

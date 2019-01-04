@@ -38,7 +38,7 @@
 
 (def sample [[25 9] [1618 10] [7999 13] [1104 17] [6111 21] [5807 30]])
 (def input
-  (let [content (slurp "inputs\\09.txt")
+  (let [content (slurp "inputs/09.txt")
         [_ player-count turn-count] (re-find #"(\d+).*;.*?(\d+)" content)]
     [(Integer/parseInt turn-count) (Integer/parseInt player-count)]))
 

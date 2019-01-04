@@ -10,11 +10,11 @@
          (clojure.string/split-lines (slurp filename)))))
 
 (def samples (vector
-               (parse-input "inputs\\25_sample1.txt")
-               (parse-input "inputs\\25_sample2.txt")
-               (parse-input "inputs\\25_sample3.txt")
-               (parse-input "inputs\\25_sample4.txt")))
-(def input (parse-input "inputs\\25.txt"))
+               (parse-input "inputs/25_sample1.txt")
+               (parse-input "inputs/25_sample2.txt")
+               (parse-input "inputs/25_sample3.txt")
+               (parse-input "inputs/25_sample4.txt")))
+(def input (parse-input "inputs/25.txt"))
 
 (defn connected [[x1 y1 z1 t1] [x2 y2 z2 t2]]
   (let [d (fn [c1 c2] (Math/abs (- c1 c2)))]

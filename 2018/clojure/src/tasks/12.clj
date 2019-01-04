@@ -18,8 +18,8 @@
                       set)]
     (vector initial-plants good-lhs)))
 
-(def sample (parse-input "inputs\\12_sample.txt"))
-(def input (parse-input "inputs\\12.txt"))
+(def sample (parse-input "inputs/12_sample.txt"))
+(def input (parse-input "inputs/12.txt"))
 
 (defn plant-image [plants pos]
   (apply str

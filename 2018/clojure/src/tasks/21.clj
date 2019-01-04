@@ -1,7 +1,7 @@
 (ns tasks.21
   (:require [tasks.vm-utils]))
 
-(def input (tasks.vm-utils/parse-input "inputs\\21.txt"))
+(def input (tasks.vm-utils/parse-input "inputs/21.txt"))
 
 (defn rng-step [r1]
   (let [r4 (bit-or r1 65536)]

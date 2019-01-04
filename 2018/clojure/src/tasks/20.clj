@@ -27,7 +27,7 @@
     => [[\"NW\"] [[[\"N\" [[\"S\"] [\"N\"]] \"E\"]]]]"
   (second (parse-regex 1 input)))
 
-(def input (read-input (clojure.string/trim-newline (slurp "inputs\\20.txt"))))
+(def input (read-input (clojure.string/trim-newline (slurp "inputs/20.txt"))))
 (def samples (mapv read-input ["^WNE$"
                                "^ENWWW(NEEE|SSE(EE|N))$"
                                "^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$"

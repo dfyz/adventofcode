@@ -15,8 +15,8 @@
   (let [lines (clojure.string/split-lines (slurp filename))]
     (reduce update-field #{} lines)))
 
-(def sample (parse-input "inputs\\17_sample.txt"))
-(def input (parse-input "inputs\\17.txt"))
+(def sample (parse-input "inputs/17_sample.txt"))
+(def input (parse-input "inputs/17.txt"))
 
 (defn taken [clay water pos]
   (or (clay pos) (water pos)))

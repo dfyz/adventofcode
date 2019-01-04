@@ -7,8 +7,8 @@
          (map (fn [x] (map #(Integer/parseInt %) x)))
          (map #(vector (take 2 %) (drop 2 %))))))
 
-(def sample (parse-input "inputs\\10_sample.txt"))
-(def input (parse-input "inputs\\10.txt"))
+(def sample (parse-input "inputs/10_sample.txt"))
+(def input (parse-input "inputs/10.txt"))
 
 (defn step [data]
   (map #(vector (apply mapv + %) (second %)) data))

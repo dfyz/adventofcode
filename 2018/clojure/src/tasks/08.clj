@@ -19,7 +19,7 @@
 (defn input->tree [input] (first (parse-tree input)))
 
 (def sample (input->tree [2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2]))
-(def input (input->tree (map #(Integer/parseInt %) (clojure.string/split (clojure.string/trim-newline (slurp "inputs\\08.txt")) #" "))))
+(def input (input->tree (map #(Integer/parseInt %) (clojure.string/split (clojure.string/trim-newline (slurp "inputs/08.txt")) #" "))))
 
 (defn solve-easy [tree]
   (let [meta-sum (apply + (tree :metadata))]

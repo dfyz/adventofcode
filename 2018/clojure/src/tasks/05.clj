@@ -1,7 +1,7 @@
 (ns tasks.05)
 
 (def sample "dabAcCaCBAcCcaDA")
-(def input (clojure.string/trim-newline (slurp "inputs\\05.txt")))
+(def input (clojure.string/trim-newline (slurp "inputs/05.txt")))
 
 (defn good-pair [ch1 ch2]
   (and
