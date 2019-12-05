@@ -1,26 +1,11 @@
 from pathlib import Path
-import operator
 
-
-def run_program(data):
-    ip = 0
-    while True:
-        opcode = data[ip]
-        if opcode == 99:
-            return
-        else:
-            in_pos1, in_pos2, out_pos = data[ip + 1:ip + 4]
-            op = {
-                1: operator.add,
-                2: operator.mul,
-            }[opcode]
-            data[out_pos] = op(data[in_pos1], data[in_pos2])
-        ip += 4
+from intcode import run_program
 
 
 def eval_program(data, in1, in2):
     data[1], data[2] = in1, in2
-    run_program(data)
+    run_program(data, [])
     return data[0]
 
 
@@ -48,7 +33,7 @@ def test_sample():
     ]
     for prog in test_programs:
         print('BEFORE', prog)
-        run_program(prog)
+        run_program(prog, [])
         print('AFTER', prog)
 
 
