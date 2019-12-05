@@ -1,11 +1,11 @@
 from pathlib import Path
 
-from intcode import run_program
+from intcode import Program
 
 
 def eval_program(data, in1, in2):
     data[1], data[2] = in1, in2
-    run_program(data, [])
+    Program(data, []).run()
     return data[0]
 
 
@@ -33,7 +33,7 @@ def test_sample():
     ]
     for prog in test_programs:
         print('BEFORE', prog)
-        run_program(prog, [])
+        Program(prog, []).run()
         print('AFTER', prog)
 
 
