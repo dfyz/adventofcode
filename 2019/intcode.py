@@ -2,25 +2,38 @@ import inspect
 import itertools
 
 
+ADD = 1
+MUL = 2
+INPUT = 3
+OUTPUT = 4
+JIT = 5
+JIF = 6
+LT = 7
+EQ = 8
+HALT = 99
+
+
 class Program:
-    def __init__(self, data, inputs):
+    def __init__(self, data, inputs, pause_on_output=False):
         self.data = data
         self.inputs = inputs
         self.outputs = []
         self.ip = 0
         self.dp = 0
+        self.pause_on_output = pause_on_output
+        self.halted = False
 
     def run(self):
-        while (opcode := self.data[self.ip]) != 99:
+        while (opcode := self.data[self.ip]) != HALT:
             op = {
-                1: self.add,
-                2: self.mul,
-                3: self.read_input,
-                4: self.print_output,
-                5: self.jump_if_true,
-                6: self.jump_if_false,
-                7: self.less_than,
-                8: self.equals,
+                ADD: self.add,
+                MUL: self.mul,
+                INPUT: self.read_input,
+                OUTPUT: self.print_output,
+                JIT: self.jump_if_true,
+                JIF: self.jump_if_false,
+                LT: self.less_than,
+                EQ: self.equals,
             }[opcode % 100]
 
             operand_count = len(inspect.signature(op).parameters)
@@ -31,6 +44,9 @@ class Program:
                 self.ip = new_ip
             else:
                 self.ip += 1 + operand_count
+            if self.pause_on_output and opcode == OUTPUT:
+                break
+        self.halted = opcode == HALT
 
     def add(self, in1, in2, out):
         self.set(out, self.get(in1) + self.get(in2))
