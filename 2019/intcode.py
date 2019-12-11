@@ -27,6 +27,7 @@ class Program:
 
     def run(self):
         while (opcode := self.data[self.ip]) != HALT:
+            raw_opcode = opcode % 100
             op = {
                 ADD: self.add,
                 MUL: self.mul,
@@ -37,7 +38,7 @@ class Program:
                 LT: self.less_than,
                 EQ: self.equals,
                 ADJUST_BASE: self.adjust_base,
-            }[opcode % 100]
+            }[raw_opcode]
 
             operand_count = len(inspect.signature(op).parameters)
             operands = self.data[self.ip + 1:self.ip + 1 + operand_count]
@@ -47,7 +48,7 @@ class Program:
                 self.ip = new_ip
             else:
                 self.ip += 1 + operand_count
-            if self.pause_on_output and opcode == OUTPUT:
+            if self.pause_on_output and raw_opcode == OUTPUT:
                 break
         self.halted = opcode == HALT
 
@@ -59,7 +60,7 @@ class Program:
 
     def read_input(self, out):
         self.set(out, self.inputs[self.dp])
-        self.dp += 1
+        self.dp = (self.dp + 1) % len(self.inputs)
 
     def print_output(self, in1):
         self.outputs.append(self.get(in1))
