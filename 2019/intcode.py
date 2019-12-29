@@ -52,6 +52,12 @@ class Program:
                 break
         self.halted = opcode == HALT
 
+    def run_times(self, n):
+        for _ in range(n):
+            self.run()
+            if self.halted:
+                break
+
     def add(self, in1, in2, out):
         self.set(out, self.get(in1) + self.get(in2))
 

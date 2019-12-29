@@ -44,10 +44,7 @@ def run_robot(data, start_with_white):
     while True:
         p.inputs = [r.get_camera()]
         p.outputs.clear()
-        for _ in range(2):
-            p.run()
-            if p.halted:
-                break
+        p.run_times(2)
         if p.halted:
             break
         color, turn = p.outputs
