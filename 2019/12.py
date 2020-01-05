@@ -1,3 +1,4 @@
+import math
 from dataclasses import dataclass
 from pathlib import Path
 import re
@@ -16,7 +17,7 @@ class Moon:
 def parse_input(input):
     return [
         Moon(
-            pos=[int(g) for g in MOON_RE.search(line).groups()],
+            pos=[int(g) for g in MOON_RE.search(line.strip()).groups()],
             vel=[0] * DIMS
         )
         for line in input.strip().split('\n')
@@ -54,9 +55,57 @@ def solve_easy(moons):
     return sum([sum_abs(m.pos) * sum_abs(m.vel) for m in moons])
 
 
+def solve_hard(moons):
+    seen_states = [set() for _ in range(DIMS)]
+    periods: List = [None] * DIMS
+    steps = 0
+
+    while True:
+        current_states = [
+            tuple((m.pos[d], m.vel[d]) for m in moons)
+            for d in range(DIMS)
+        ]
+        for d in range(DIMS):
+            if periods[d] is None and current_states[d] in seen_states[d]:
+                periods[d] = steps
+            seen_states[d].add(current_states[d])
+        if None not in periods:
+            break
+        move_moons(moons)
+        steps += 1
+
+    def lcm(a, b):
+        g = math.gcd(a, b)
+        return g * (a // g) * (b // g)
+
+    return lcm(periods[0], lcm(periods[1], periods[2]))
+
+
+def test_sample():
+    samples = list(map(parse_input, [
+        '''
+        <x=-1, y=0, z=2>
+        <x=2, y=-10, z=-7>
+        <x=4, y=-8, z=8>
+        <x=3, y=5, z=-1>
+        ''',
+        '''
+        <x=-8, y=-10, z=0>
+        <x=5, y=5, z=10>
+        <x=2, y=-7, z=3>
+        <x=9, y=-8, z=-3>
+        ''',
+    ]))
+
+    for moons in samples:
+        print(solve_hard(moons))
+
+
 def main():
     data = parse_input(Path('12.txt').read_text())
+    test_sample()
     print(solve_easy(data))
+    print(solve_hard(data))
 
 
 if __name__ == '__main__':
