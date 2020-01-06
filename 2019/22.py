@@ -6,13 +6,13 @@ def parse_input(input):
     def parse_line(line):
         command, *args, last_arg = line.strip().split()
         if last_arg == 'stack':
-            return ('reverse', None)
-        return (command, int(last_arg))
+            return 'reverse', None
+        return command, int(last_arg)
 
     return list(map(parse_line, input.strip().split('\n')))
 
 
-def shuffle(commands, n):
+def naive_shuffle(commands, n):
     deck = collections.deque(range(n))
     for cmd, arg in commands:
         if cmd == 'reverse':
@@ -26,9 +26,56 @@ def shuffle(commands, n):
     return deck
 
 
+def mat_mul(m1, m2, n):
+    dim = len(m1)
+    return [
+        [
+            sum(m1[row][k] * m2[k][col] for k in range(dim)) % n
+            for col in range(dim)
+        ]
+        for row in range(dim)
+    ]
+
+
+def mat_pow(mat, p, n):
+    if p == 0:
+        return [[1, 0], [0, 1]]
+    result = mat_pow(mat, p // 2, n)
+    result = mat_mul(result, result, n)
+    if p % 2 == 1:
+        result = mat_mul(result, mat, n)
+    return result
+
+
+def shuffle(commands, n, p):
+    def transform(cmd, arg):
+        if cmd == 'reverse':
+            return -1, -1
+        elif cmd == 'cut':
+            return 1, -arg
+        elif cmd == 'deal':
+            return arg, 0
+
+    a, b = 1, 0
+    for full_cmd in commands:
+        next_a, next_b = map(lambda x: x % n, transform(*full_cmd))
+        a = (next_a * a) % n
+        b = (next_a * b + next_b) % n
+
+    result = mat_pow([[a, b], [0, 1]], p, n)
+    a, b = result[0]
+    return ((2020 + (-b % n)) * pow(a, n - 2, n)) % n
+
+
 def solve_easy(commands):
-    deck = shuffle(commands, 10007)
+    deck = naive_shuffle(commands, 10007)
     return deck.index(2019)
+
+
+def solve_hard(commands):
+    n = 119315717514047
+    p = 101741582076661
+    return shuffle(commands, n, p)
 
 
 def test_sample():
@@ -62,13 +109,14 @@ def test_sample():
         '''
     ]))
     for s in samples:
-        print(shuffle(s, 10))
+        print(naive_shuffle(s, 10))
+        print(shuffle(s, 10, 1))
 
 
 def main():
     data = parse_input(Path('22.txt').read_text())
-    test_sample()
     print(solve_easy(data))
+    print(solve_hard(data))
 
 
 if __name__ == '__main__':
