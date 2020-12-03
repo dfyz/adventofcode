@@ -26,9 +26,9 @@ fn solve(input: []u8, policy: Policy) !u64 {
     var it = std.mem.tokenize(input, ":- \n");
     while (it.next()) |token| {
         const num1 = try std.fmt.parseInt(u64, token, 10);
-        const num2 = try std.fmt.parseInt(u64, try readToken(&it), 10);
-        const needle = (try readToken(&it))[0];
-        const haystack = try readToken(&it);
+        const num2 = try std.fmt.parseInt(u64, it.next().?, 10);
+        const needle = it.next().?[0];
+        const haystack = it.next().?;
 
         if (policy(num1, num2, needle, haystack)) {
             result += 1;
