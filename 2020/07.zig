@@ -59,7 +59,7 @@ pub fn main() !void {
 
     var it = std.mem.tokenize(input, "\n");
     while (it.next()) |line| {
-        const color_end = std.mem.indexOf(u8, line, " bags") orelse unreachable;
+        const color_end = std.mem.indexOf(u8, line, " bags").?;
         const key = line[0..color_end];
         try color_to_idx.put(key, color_to_idx.count());
     }
@@ -81,11 +81,11 @@ pub fn main() !void {
         while (word_it.next()) |word| {
             if (std.fmt.parseInt(u64, word, 10)) |count| {
                 const rest = word_it.rest();
-                const color_end = std.mem.indexOf(u8, rest, " bag") orelse unreachable;
+                const color_end = std.mem.indexOf(u8, rest, " bag").?;
                 const key = word_it.rest()[0..color_end];
                 try sub_bags.append(SubBag{
                     .count = count,
-                    .index = color_to_idx.get(key) orelse unreachable,
+                    .index = color_to_idx.get(key).?,
                 });
             } else |err| {}
         }
@@ -93,7 +93,7 @@ pub fn main() !void {
         line_idx += 1;
     }
 
-    const shiny_gold_idx = color_to_idx.get("shiny gold") orelse unreachable;
+    const shiny_gold_idx = color_to_idx.get("shiny gold").?;
     var can_reach = try allocator.alloc(?bool, bag_count);
     defer allocator.free(can_reach);
     std.mem.set(?bool, can_reach, null);
