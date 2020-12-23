@@ -29,21 +29,24 @@ const Player = struct {
         return self.size == 0;
     }
 
+    fn at(self: *const Player, pos: usize) u64 {
+        return self.nums[(self.start_idx + pos) % self.nums.len];
+    }
+
     fn score(self: *const Player) u64 {
         var result: u64 = 0;
-        var it = self.iterator();
-        while (it.next()) {
-            result += (self.size - it.pos.?) * self.nums[it.idx];
+        var pos: usize = 0;
+        while (pos < self.size) : (pos += 1) {
+            result += (self.size - pos) * self.at(pos);
         }
         return result;
     }
 
     fn asHashable(self: *const Player, allocator: *std.mem.Allocator) ![]u64 {
         var result = try allocator.alloc(u64, self.size);
-        var it = self.iterator();
-        var idx: usize = 0;
-        while (it.next()) : (idx += 1) {
-            result[idx] = self.nums[it.idx];
+        var pos: usize = 0;
+        while (pos < self.size) : (pos += 1) {
+            result[pos] = self.at(pos);
         }
         return result;
     }
@@ -54,36 +57,6 @@ const Player = struct {
             .start_idx = self.start_idx,
             .size = n,
         };
-    }
-
-    const Iterator = struct {
-        full_size: usize,
-        size: usize,
-        idx: usize,
-        pos: ?usize,
-
-        fn init(player: *const Player) Iterator {
-            return Iterator{
-                .full_size = player.nums.len,
-                .size = player.size,
-                .idx = player.start_idx,
-                .pos = null,
-            };
-        }
-
-        fn next(self: *Iterator) bool {
-            if (self.pos) |*pos| {
-                pos.* += 1;
-                self.idx = (self.idx + 1) % self.full_size;
-            } else {
-                self.pos = 0;
-            }
-            return self.pos.? < self.size;
-        }
-    };
-
-    fn iterator(self: *const Player) Iterator {
-        return Iterator.init(self);
     }
 };
 
