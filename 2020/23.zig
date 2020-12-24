@@ -1,98 +1,80 @@
 const std = @import("std");
 
-const N = 9;
+const ProblemType = enum {
+    easy,
+    hard,
+};
 
-fn cycle(digit: u64) u64 {
-    return if (digit == 1) N else digit - 1;
+fn getDest(current: u64, n: u64) u64 {
+    return if (current == 1) n else current - 1;
 }
 
-fn to_digits(num: u64) [N]u64 {
-    var result = [_]u64{0} ** N;
+fn play_game(allocator: *std.mem.Allocator, prefix: []const u64, n: usize, moves: u64, problem_type: ProblemType) !u64 {
+    var next = try allocator.alloc(u64, n + 1);
+    for (prefix) |p, idx| {
+        var np = &next[p];
+        if (idx + 1 < prefix.len) {
+            np.* = prefix[idx + 1];
+        } else {
+            np.* = if (prefix.len == n) prefix[0] else prefix.len + 1;
+        }
+    }
+    if (n > prefix.len) {
+        var idx: usize = prefix.len + 1;
+        while (idx < n) : (idx += 1) {
+            next[idx] = idx + 1;
+        }
+        next[n] = prefix[0];
+    }
+
     var idx: usize = 0;
-    var tmp_num = num;
-    while (idx < result.len) : (idx += 1) {
-        result[N - 1 - idx] = tmp_num % 10;
-        tmp_num /= 10;
-    }
-    return result;
-}
+    var current: u64 = prefix[0];
 
-fn move(num: u64) u64 {
-    var digits = to_digits(num);
-    const skip = 3;
+    while (idx < moves) : (idx += 1) {
+        const a = next[current];
+        const b = next[a];
+        const c = next[b];
 
-    const current = digits[0];
-    const a = digits[skip - 2];
-    const b = digits[skip - 1];
-    const c = digits[skip];
-
-    var next = cycle(current);
-    var insert_pos: ?usize = null;
-    while (insert_pos == null) : (next = cycle(next)) {
-        insert_pos = std.mem.indexOfScalar(u64, digits[skip + 1 ..], next);
-        if (insert_pos) |*pos| {
-            pos.* += skip + 1;
+        var dest = getDest(current, n);
+        while (dest == a or dest == b or dest == c) {
+            dest = getDest(dest, n);
         }
+
+        next[current] = next[c];
+        next[c] = next[dest];
+        next[dest] = a;
+
+        current = next[current];
     }
 
-    var result: u64 = 0;
-    var idx: usize = skip + 1;
-    while (idx < digits.len) : (idx += 1) {
-        // std.debug.print("{} {} {}\n", .{ idx, insert_pos, result });
-        result = result * 10 + digits[idx];
-        if (idx == insert_pos) {
-            result = result * 1000 + a * 100 + b * 10 + c;
-        }
+    switch (problem_type) {
+        .easy => {
+            var result: u64 = 0;
+            idx = 1;
+            current = next[1];
+            while (idx < n) : (idx += 1) {
+                result = result * 10 + current;
+                current = next[current];
+            }
+            return result;
+        },
+        .hard => {
+            const star1 = next[1];
+            const star2 = next[star1];
+            return star1 * star2;
+        },
     }
-    result = result * 10 + current;
-    return result;
-}
-
-test "move" {
-    const expect = @import("std").testing.expect;
-
-    const nums = [_]u64{
-        389125467,
-        289154673,
-        546789132,
-        891346725,
-        467913258,
-        136792584,
-        936725841,
-        258367419,
-        674158392,
-        574183926,
-        837419265,
-    };
-
-    for (nums) |n, idx| {
-        if (idx + 1 < nums.len) {
-            expect(move(nums[idx]) == nums[idx + 1]);
-        }
-    }
-}
-
-fn to_answer(num: u64) u64 {
-    const digits = to_digits(num);
-    const pos1 = std.mem.indexOfScalar(u64, digits[0..], 1).?;
-    var result: u64 = 0;
-    var idx: usize = pos1 + 1;
-    while (idx < digits.len) : (idx += 1) {
-        result = result * 10 + digits[idx];
-    }
-    idx = 0;
-    while (idx < pos1) : (idx += 1) {
-        result = result * 10 + digits[idx];
-    }
-    return result;
 }
 
 pub fn main() !void {
-    var num: u64 = try std.fmt.parseInt(u64, @embedFile("23.txt"), 10);
-    var idx: usize = 0;
-    while (idx < 100) : (idx += 1) {
-        num = move(num);
+    const input = @embedFile("23.txt");
+    var prefix = [_]u64{0} ** input.len;
+    for (input) |ch, idx| {
+        prefix[idx] = ch - '0';
     }
 
-    std.debug.print("EASY: {}\n", .{to_answer(num)});
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    const prefixSlice = prefix[0..];
+    std.debug.print("EASY: {}\n", .{try play_game(&arena.allocator, prefixSlice, prefix.len, 100, .easy)});
+    std.debug.print("HARD: {}\n", .{try play_game(&arena.allocator, prefixSlice, 1_000_000, 10_000_000, .hard)});
 }
