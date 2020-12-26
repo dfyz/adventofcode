@@ -113,7 +113,7 @@ fn dlog(comptime x: u64) u64 {
             }
         }
     }
-    unreachable;
+    @compileError("your discrete log doesn't work");
 }
 
 fn parseInt(comptime x: []const u8) u64 {
