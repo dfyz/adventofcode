@@ -46,8 +46,32 @@ fn inverse(comptime x: u64) u64 {
     return pow(x, N - 2);
 }
 
+fn partition(comptime table: []TableElem, low: usize, high: usize) usize {
+    const pivot = table[high - 1].smol_pow;
+    var less_pos = low;
+    var idx = low;
+    while (idx < high) : (idx += 1) {
+        if (table[idx].smol_pow < pivot) {
+            std.mem.swap(TableElem, &table[idx], &table[less_pos]);
+            less_pos += 1;
+        }
+    }
+    std.mem.swap(TableElem, &table[high - 1], &table[less_pos]);
+    return less_pos;
+}
+
+fn quicksort(comptime table: []TableElem, low: usize, high: usize) void {
+    if (low >= high) {
+        return;
+    }
+
+    const pivot_idx = partition(table, low, high);
+    quicksort(table, low, pivot_idx);
+    quicksort(table, pivot_idx + 1, high);
+}
+
 fn getTable(comptime n_sqrt: u64) [n_sqrt + 1]TableElem {
-    @setEvalBranchQuota(100000);
+    @setEvalBranchQuota(1000000);
     var result = [1]TableElem{std.mem.zeroes(TableElem)} ** (n_sqrt + 1);
 
     result[0] = TableElem{
@@ -66,22 +90,27 @@ fn getTable(comptime n_sqrt: u64) [n_sqrt + 1]TableElem {
             .big_pow = result[idx - 1].big_pow * n_sqrt_pow % N,
         };
     }
-    std.sort.sort(TableElem, result[0..], {}, TableElem.less);
+    quicksort(result[0..], 0, result.len);
     return result;
 }
 
 fn dlog(comptime x: u64) u64 {
-    @setEvalBranchQuota(100000);
-    const tableSlice = TABLE[0..];
-    for (TABLE) |*e| {
+    @setEvalBranchQuota(1000000);
+    for (TABLE) |*e, idx| {
         const big_index = NSQRT * e.exp;
-        const to_find = TableElem{
-            .exp = 0,
-            .smol_pow = x * inverse(e.big_pow) % N,
-            .big_pow = 0,
-        };
-        if (std.sort.binarySearch(TableElem, to_find, tableSlice, {}, TableElem.cmp)) |found_idx| {
-            return big_index + TABLE[found_idx].exp;
+        const needle = x * inverse(e.big_pow) % N;
+        var low = 0;
+        var high = TABLE.len - 1;
+        while (low <= high) {
+            const mid = (low + high) / 2;
+            const cand = TABLE[mid].smol_pow;
+            if (cand == needle) {
+                return big_index + TABLE[mid].exp;
+            } else if (cand < needle) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
         }
     }
     unreachable;
