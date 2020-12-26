@@ -120,11 +120,6 @@ fn parseInt(comptime x: []const u8) u64 {
     return std.fmt.parseInt(u64, x, 10) catch unreachable;
 }
 
-const Answer = struct {
-    dloga: u64,
-    dlogb: u64,
-};
-
 fn getAnswer(comptime input: []const u8) u64 {
     comptime {
         const newline_idx = std.mem.indexOfScalar(u8, input, '\n').?;
