@@ -1,8 +1,9 @@
 const std = @import("std");
 
-const RuleType = enum {
+const RuleType = enum(usize) {
     terminal,
     nonterminal,
+    rule8,
     wildcard,
 };
 
@@ -11,6 +12,7 @@ const Children = [2]usize;
 const Rule = union(RuleType) {
     terminal: u8,
     nonterminal: [2]Children,
+    rule8: [2]Children,
     wildcard: void,
 };
 
@@ -31,7 +33,11 @@ fn childrenOrDie(it: *std.mem.TokenIterator) Children {
     return Children{ intOrDie(it.next().?), intOrDie(it.next().?) };
 }
 
-fn ruleOrDie(rule: *const RawRule, raw_rules: []const RawRule) Rule {
+fn ruleOrDie(rule: *const RawRule) Rule {
+    if (rule.index == 8) {
+        const dummy_children = Children{ 42, 8 };
+        return Rule{ .rule8 = [_]Children{ dummy_children, dummy_children } };
+    }
     if (std.mem.indexOfScalar(u8, rule.rule_str, '"') != null) {
         return Rule{ .terminal = rule.rule_str[1] };
     }
@@ -39,23 +45,16 @@ fn ruleOrDie(rule: *const RawRule, raw_rules: []const RawRule) Rule {
     const has_pipe = std.mem.indexOfScalar(u8, rule.rule_str, '|') != null;
     var it = std.mem.tokenize(rule.rule_str, " |");
     if (!has_pipe) {
-        if (space_count == 0) {
-            return ruleOrDie(&raw_rules[intOrDie(rule.rule_str)], raw_rules);
-        } else {
-            std.debug.assert(space_count == 1);
-            const children = childrenOrDie(&it);
-            return Rule{
-                .nonterminal = [_]Children{
-                    children,
-                    children,
-                },
-            };
-        }
+        std.debug.assert(space_count == 1);
+        const children = childrenOrDie(&it);
+        return Rule{
+            .nonterminal = [_]Children{
+                children,
+                children,
+            },
+        };
     } else {
         if (space_count == 2) {
-            for (childrenOrDie(&it)) |ch| {
-                std.debug.assert(ruleOrDie(&raw_rules[ch], raw_rules) == .terminal);
-            }
             return Rule.wildcard;
         } else {
             const children1 = childrenOrDie(&it);
@@ -102,11 +101,12 @@ fn Array3D(comptime T: type) type {
     };
 }
 
-pub fn main() !void {
-    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    var allocator = &arena.allocator;
+const ProblemType = enum {
+    easy,
+    hard,
+};
 
-    var input = try std.fs.cwd().readFileAlloc(allocator, "19.txt", std.math.maxInt(usize));
+fn solve(allocator: *std.mem.Allocator, input: []const u8, problem_type: ProblemType) !u64 {
     var line_it = std.mem.split(input, "\n");
     var rules_read = false;
 
@@ -125,10 +125,10 @@ pub fn main() !void {
 
     var rules = std.ArrayList(Rule).init(allocator);
     for (raw_rules.items) |*pr| {
-        try rules.append(ruleOrDie(pr, raw_rules.items));
+        try rules.append(ruleOrDie(pr));
     }
 
-    var easy_answer: u64 = 0;
+    var result: u64 = 0;
     while (line_it.next()) |line| {
         if (line.len == 0) {
             break;
@@ -141,18 +141,41 @@ pub fn main() !void {
         while (len <= line.len) : (len += 1) {
             var start: usize = 0;
             while (start + len <= line.len) : (start += 1) {
-                for (rules.items) |r, idx| {
-                    if (switch (r) {
+                var raw_rule_idx: usize = 0;
+                while (raw_rule_idx < rules.items.len) : (raw_rule_idx += 1) {
+                    const idx = rules.items.len - 1 - raw_rule_idx;
+                    const rule = rules.items[idx];
+
+                    if (switch (rule) {
                         .terminal => |t| len == 1 and line[start] == t,
-                        .nonterminal => |nt| blk: {
-                            var len1: usize = 1;
-                            while (len1 < len) : (len1 += 1) {
-                                const len2 = len - len1;
-                                if (can_match.get(start, len1, nt[0][0]) and can_match.get(start + len1, len2, nt[0][1])) {
-                                    break :blk true;
+                        .nonterminal, .rule8 => |nt| blk: {
+                            if (rule == .rule8 and can_match.get(start, len, 42)) {
+                                break :blk true;
+                            }
+
+                            if (rule != .rule8 or problem_type == .hard) {
+                                var len1: usize = 1;
+                                while (len1 < len) : (len1 += 1) {
+                                    const len2 = len - len1;
+                                    if (can_match.get(start, len1, nt[0][0]) and can_match.get(start + len1, len2, nt[0][1])) {
+                                        break :blk true;
+                                    }
+                                    if (can_match.get(start, len1, nt[1][0]) and can_match.get(start + len1, len2, nt[1][1])) {
+                                        break :blk true;
+                                    }
                                 }
-                                if (can_match.get(start, len1, nt[1][0]) and can_match.get(start + len1, len2, nt[1][1])) {
-                                    break :blk true;
+                            }
+
+                            if (idx == 11 and problem_type == .hard) {
+                                var len1: usize = 1;
+                                while (len1 < len) : (len1 += 1) {
+                                    var len2: usize = 1;
+                                    while (len1 + len2 < len) : (len2 += 1) {
+                                        const len3 = len - len1 - len2;
+                                        if (can_match.get(start, len1, 42) and can_match.get(start + len1, len2, 11) and can_match.get(start + len1 + len2, len3, 31)) {
+                                            break :blk true;
+                                        }
+                                    }
                                 }
                             }
                             break :blk false;
@@ -165,8 +188,17 @@ pub fn main() !void {
             }
         }
 
-        easy_answer += @boolToInt(can_match.get(0, line.len, 0));
+        result += @boolToInt(can_match.get(0, line.len, 0));
     }
+    return result;
+}
 
-    std.debug.print("EASY: {}\n", .{easy_answer});
+pub fn main() !void {
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    var allocator = &arena.allocator;
+
+    var input = try std.fs.cwd().readFileAlloc(allocator, "19.txt", std.math.maxInt(usize));
+
+    std.debug.print("EASY: {}\n", .{try solve(allocator, input, .easy)});
+    std.debug.print("HARD: {}\n", .{try solve(allocator, input, .hard)});
 }
