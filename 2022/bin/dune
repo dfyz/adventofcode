@@ -1,0 +1,3 @@
+(executables
+    (names sln_01 sln_02 sln_03)
+    (libraries aoc))
