@@ -7,3 +7,5 @@ let read_input base_name =
         | exception End_of_file -> List.rev acc
         | line -> read (line :: acc) in
     read []
+
+let list_sum = List.fold_left (+) 0
