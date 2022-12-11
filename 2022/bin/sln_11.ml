@@ -36,7 +36,9 @@ module ModNum: Num = struct
     let add = apply_op (fun (m, (a, b)) -> (a + b) mod m)
     let mul = apply_op (fun (m, (a, b)) -> (a * b) mod m)
 
-    let div _ _ = failwith "Division is not supported"
+    let div num m = if m = 1
+        then num
+        else failwith "Division is not supported"
 
     let modulus num m =
         List.combine num.mod_vals num.mods
@@ -125,11 +127,7 @@ module Monkey(N: Num) = struct
     let run_round monkeys div_by =
         let run_monkey m =
             Queue.iter (fun item ->
-                let after_op = m.op item in
-                let new_item = if div_by <> 1
-                    then N.div after_op div_by
-                    else after_op
-                in
+                let new_item = N.div (m.op item) div_by in
                 let new_monkey =
                     if N.modulus new_item m.div_test = 0
                         then m.true_monkey
