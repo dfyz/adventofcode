@@ -1,7 +1,4 @@
-module Locs = Set.Make(struct
-    type t = int * int
-    let compare = compare
-end)
+module Locs = Aoc.Common.Locs
 
 let (rows, cols, input) =
     let raw_input = Aoc.Common.read_input "input_08.txt" in

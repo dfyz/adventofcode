@@ -9,3 +9,8 @@ let read_input base_name =
     read []
 
 let list_sum = List.fold_left (+) 0
+
+module Locs = Set.Make(struct
+    type t = int * int
+    let compare = compare
+end)
