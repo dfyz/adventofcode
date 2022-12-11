@@ -1,4 +1,4 @@
-let input_name = "input_11.txt"
+let input_name = "sample_input_11.txt"
 
 module type Num = sig
     type t
@@ -7,7 +7,7 @@ module type Num = sig
     val mul: t -> t -> t
     val div: t -> int -> t
     val modulus: t -> int -> int
-    val of_int: int -> t
+    val of_int_and_mods: int list -> int -> t
 end
 
 module RegularNum: Num = struct
@@ -17,7 +17,36 @@ module RegularNum: Num = struct
     let mul = ( * )
     let div = (/)
     let modulus = (mod)
-    let of_int = fun x -> x
+    let of_int_and_mods _ x = x
+end
+
+module ModNum: Num = struct
+    type t = {
+        mod_vals: int list;
+        mods: int list;
+    }
+
+    let apply_op op num1 num2 =
+        assert (num1.mods = num2.mods);
+        let zipped = List.combine num1.mod_vals num2.mod_vals |> List.combine num1.mods in {
+            mod_vals = List.map op zipped;
+            mods = num1.mods;        
+        }
+
+    let add = apply_op (fun (m, (a, b)) -> (a + b) mod m)
+    let mul = apply_op (fun (m, (a, b)) -> (a * b) mod m)
+
+    let div _ _ = failwith "Division is not supported"
+
+    let modulus num m =
+        List.combine num.mod_vals num.mods
+            |> List.find (fun (_, mm) -> m = mm)
+            |> fst
+
+    let of_int_and_mods mods x = {
+        mod_vals = List.map (fun m -> x mod m) mods;
+        mods;
+    }
 end
 
 module Monkey(N: Num) = struct
@@ -33,6 +62,17 @@ module Monkey(N: Num) = struct
     }
 
     let parse_input () =
+        let last_int s =
+            s |> String.split_on_char ' ' |> List.rev |> List.hd |> int_of_string
+        in
+
+        let lines = Aoc.Common.read_input input_name in
+        let all_mods = List.filter_map (fun line ->
+            match (line |> String.trim |> String.split_on_char ' ') with
+                | "Test:" :: _ -> Some (last_int line)
+                | _ -> None
+        ) lines
+        in
         let rec parse = function
             | [] -> []
             | "" :: rest -> parse rest
@@ -43,7 +83,7 @@ module Monkey(N: Num) = struct
                             |> String.split_on_char ','
                             |> List.map String.trim
                             |> List.map int_of_string
-                            |> List.map N.of_int
+                            |> List.map (N.of_int_and_mods all_mods)
                             |> List.to_seq
                             |> Queue.of_seq
                     | _ -> failwith "Invalid items"
@@ -59,17 +99,13 @@ module Monkey(N: Num) = struct
                         let eval_operand o =
                             fun x -> match o with
                                 | "old" -> x
-                                | imm -> int_of_string imm |> N.of_int
+                                | imm -> int_of_string imm |> N.of_int_and_mods all_mods
                         in
                         fun x ->
                             let lhs = x |> eval_operand operand1 in
                             let rhs = x |> eval_operand operand2 in
                             op lhs rhs
                     | _ -> failwith "Invalid operation"
-                in
-
-                let last_int s =
-                    s |> String.split_on_char ' ' |> List.rev |> List.hd |> int_of_string
                 in
 
                 let monkey = {
@@ -84,7 +120,7 @@ module Monkey(N: Num) = struct
                 monkey :: parse rest
             | _ -> failwith "Invalid input"
         in
-        Aoc.Common.read_input input_name |> parse |> Array.of_list
+        lines |> parse |> Array.of_list
 
     let run_round monkeys div_by =
         let run_monkey m =
