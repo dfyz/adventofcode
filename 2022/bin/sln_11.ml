@@ -1,4 +1,4 @@
-let input_name = "sample_input_11.txt"
+let input_name = "input_11.txt"
 
 module type Num = sig
     type t
@@ -125,7 +125,11 @@ module Monkey(N: Num) = struct
     let run_round monkeys div_by =
         let run_monkey m =
             Queue.iter (fun item ->
-                let new_item = N.div (m.op item) div_by in
+                let after_op = m.op item in
+                let new_item = if div_by <> 1
+                    then N.div after_op div_by
+                    else after_op
+                in
                 let new_monkey =
                     if N.modulus new_item m.div_test = 0
                         then m.true_monkey
@@ -164,3 +168,9 @@ let solve_easy =
     let monkeys = M.run_rounds 20 3 in
     let ans = M.monkey_score monkeys in
     Printf.printf "easy: %d\n" ans
+
+let solve_hard =
+    let module M = Monkey(ModNum) in
+    let monkeys = M.run_rounds 10000 1 in
+    let ans = M.monkey_score monkeys in
+    Printf.printf "hard: %d\n" ans
