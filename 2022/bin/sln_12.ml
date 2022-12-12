@@ -25,29 +25,33 @@ let can_move (from_r, from_c) (to_r, to_c) =
 
 let find_pos ch =
     let rec impl r c =
-        if input.(r).(c) = ch
-        then (r, c)
-        else match (r, c) with
-            | (r, c) when r = rows - 1 && c = cols - 1 -> failwith "Char not found"
+        let rest = match (r, c) with
+            | (r, c) when r = rows - 1 && c = cols - 1 -> []
             | (_, c) when c < cols - 1 -> impl r (c + 1)
             | _ -> impl (r + 1) 0
+        in
+        if input.(r).(c) = ch
+            then (r, c) :: rest
+            else rest
     in
     impl 0 0
 
-let start_pos = find_pos 'S'
-let end_pos = find_pos 'E'
+let find_one ch = find_pos ch |> List.hd
 
-let solve_easy =
+let start_pos = find_one 'S'
+let end_pos = find_one 'E'
+
+let solve_from start =
     let q = Queue.create () in
     let dist = Hashtbl.create 0 in
 
     let rec bfs q =
         match Queue.take_opt q with
-            | None -> failwith "Queue exhausted"
+            | None -> None
             | Some ((r, c) as src) ->
                 let cur_dist = Hashtbl.find dist src in
                 if src = end_pos
-                    then cur_dist
+                    then Some cur_dist
                     else
                         let adj = List.filter (fun dst ->
                             can_move src dst && not (Hashtbl.mem dist dst)
@@ -64,6 +68,16 @@ let solve_easy =
                         bfs q
     in
 
-    Queue.push start_pos q;
-    Hashtbl.add dist start_pos 0;
-    Printf.printf "easy: %d\n" (bfs q)
+    Queue.push start q;
+    Hashtbl.add dist start 0;
+    bfs q
+
+let solve_easy =
+    let ans = Option.get (solve_from start_pos) in
+    Printf.printf "easy: %d\n" ans
+
+let solve_hard =
+    (* ignore the square marked with S, since it can't be the answer *)
+    let starts = find_pos 'a' in
+    let ans = starts |> List.filter_map solve_from |> List.fold_left (min) Int.max_int in
+    Printf.printf "hard: %d\n" ans
