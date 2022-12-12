@@ -1,3 +1,3 @@
 (executables
-    (names sln_01 sln_02 sln_03 sln_04 sln_05 sln_06 sln_07 sln_08 sln_09 sln_10 sln_11)
+    (names sln_01 sln_02 sln_03 sln_04 sln_05 sln_06 sln_07 sln_08 sln_09 sln_10 sln_11 sln_12)
     (libraries aoc))
