@@ -1,2 +1,5 @@
 (library
     (name aoc))
+
+(ocamllex lexer_13)
+(ocamlyacc parser_13)
