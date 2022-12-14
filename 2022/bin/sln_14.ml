@@ -46,27 +46,46 @@ let traced_input =
 let (sand_x, sand_y) as sand_pos = (500, 0)
 let max_y = traced_input |> Locs.to_seq |> Seq.map snd |> Seq.fold_left (max) sand_y
 
-let drop_sand trace =
+let can_move ((_, y) as pos) trace is_easy =
+    let in_trace = Locs.mem pos trace in
+    let is_blocked =
+    if is_easy
+        then in_trace
+        else in_trace || (y = max_y + 2)
+    in
+    not is_blocked
+
+let drop_sand trace is_easy =
     let rec impl ((x, y) as pos) trace =
-        if y > max_y
+        if is_easy && y > max_y
             then None
             else
                 let next_y = y + 1 in
                 let next_xs = [x; x - 1; x + 1] in
                 let cands = List.map (fun x -> (x, next_y)) next_xs in
-                match List.find_opt (fun x -> not (Locs.mem x trace)) cands with
+                match List.find_opt (fun x ->
+                    can_move x trace is_easy
+                ) cands with
                     | Some next_pos -> impl next_pos trace
                     | None -> Some (Locs.add pos trace)
     in
     impl sand_pos trace
 
-let compute_sand =
+let compute_sand is_easy =
     let rec impl trace =
-        match drop_sand trace with
-            | None -> Locs.diff trace traced_input
-            | Some next_trace -> impl next_trace
+        let diff = Locs.diff trace traced_input in
+        match drop_sand trace is_easy with
+            | None ->
+                if is_easy
+                    then diff
+                    else failwith "Uh oh"
+            | Some next_trace ->
+                if is_easy || next_trace <> trace
+                    then impl next_trace
+                    else diff
     in
     impl traced_input
 
-let easy =
-    Printf.printf "easy: %d\n" (Locs.cardinal compute_sand)
+let _ =
+    Printf.printf "easy: %d\n" (Locs.cardinal (compute_sand true));
+    Printf.printf "hard: %d\n" (Locs.cardinal (compute_sand false))
