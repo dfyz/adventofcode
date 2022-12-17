@@ -1,5 +1,6 @@
 (library
-    (name aoc))
+    (name aoc)
+    (libraries str))
 
 (ocamllex lexer_13)
 (ocamlyacc parser_13)

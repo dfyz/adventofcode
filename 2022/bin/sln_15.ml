@@ -5,20 +5,17 @@ type sensor = {
 
 let input =
     let raw_input = Aoc.Common.read_input "input_15.txt" in
-    let line_re = Str.regexp {|Sensor at x=\(.+\), y=\(.+\): closest beacon is at x=\(.+\), y=\(.+\)|} in
-    let parse_line line =
-        assert (Str.string_match line_re line 0);
-        match List.map (fun idx ->
-                Str.matched_group idx line |> int_of_string
-            ) [1; 2; 3; 4]
-        with
+    Aoc.Common.parse_lines_with_re
+        {|Sensor at x=\(.+\), y=\(.+\): closest beacon is at x=\(.+\), y=\(.+\)|}
+        raw_input
+        4
+        (fun lst -> match List.map int_of_string lst with
             | [a; b; c; d] -> {
                 pos = (a, b);
                 beacon = (c, d);
             }
             | _ -> failwith "Invalid input"
-    in
-    raw_input |> List.map parse_line
+        )
 
 let sensor_dist {
     pos = (x1, y1);
