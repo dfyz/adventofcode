@@ -56,7 +56,6 @@ let best_pressure =
                         if_no_open_max
                     else
                         let open_profit = profit cur time in
-                        (* Printf.printf "profit from %s at time %d: %d\n" cur_name time open_profit; *)
                         let if_open =
                             impl
                                 cur_name
