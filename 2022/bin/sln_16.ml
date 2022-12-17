@@ -22,10 +22,45 @@ let input =
             | _ -> failwith "Invalid input"
         )
 
+let good_valve_names = input
+    |> List.filter (fun v -> v.Valve.flow_rate > 0)
+    |> List.map (fun v -> v.Valve.name)
+
 let name_to_valve = input
     |> List.map (fun v -> (v.Valve.name, v))
     |> List.to_seq
     |> Hashtbl.of_seq
+
+let valve_dist =
+    let dist = Hashtbl.create 0 in
+    input |> List.iter (fun src ->
+        Hashtbl.add dist (src.Valve.name, src.Valve.name) 0;
+        src.Valve.adj |> List.iter (fun dst ->
+            Hashtbl.add dist (src.name, dst) 1
+        )
+    );
+    input |> List.iter (fun kv ->
+        let k = kv.Valve.name in
+        input |> List.iter (fun iv ->
+            let i = iv.Valve.name in
+            input |> List.iter (fun jv ->
+                let j = jv.Valve.name in
+                match (Hashtbl.find_opt dist (i, k), Hashtbl.find_opt dist (k, j)) with
+                | (Some dist_ik, Some dist_kj) ->
+                    let new_dist = dist_ik + dist_kj in
+                    begin
+                        match Hashtbl.find_opt dist (i, j) with
+                        | Some old_dist when new_dist < old_dist ->
+                            Hashtbl.replace dist (i, j) new_dist
+                        | None ->
+                            Hashtbl.add dist (i, j) new_dist
+                        | _ -> ()
+                    end
+                | _ -> ()
+            )
+        )
+    );
+    dist
 
 let minutes = 30
 
@@ -36,37 +71,27 @@ let profit valve time =
 
 let best_pressure =
     let cache = Hashtbl.create 0 in
-    let rec impl cur_name cur_valves time =
-        let cache_key = (cur_name, cur_valves, time) in
+    let rec impl cur time left =
+        let cache_key = (cur, time, left) in
         match Hashtbl.find_opt cache cache_key with
         | Some v -> v
         | None ->
             let computed_val =
-                if time > minutes
-                then
-                    0
-                else
-                    let cur = Hashtbl.find name_to_valve cur_name in
-                    let if_no_open_max = cur.adj |> List.map (
-                        fun next_name -> impl next_name cur_valves (time + 1)
-                    ) |> List.fold_left (max) 0
-                    in
-                    if cur.flow_rate = 0 || ValveSet.mem cur_name cur_valves
+                left |> ValveSet.to_seq |> List.of_seq |> List.filter_map (function next ->
+                    let to_go = Hashtbl.find valve_dist (cur, next) in
+                    let next_time = time + to_go + 1 in
+                    if next = cur || next_time > minutes
                     then
-                        if_no_open_max
+                        None
                     else
-                        let open_profit = profit cur time in
-                        let if_open =
-                            impl
-                                cur_name
-                                (ValveSet.add cur_name cur_valves)
-                                (time + 1)
-                        in
-                        max if_no_open_max (open_profit + if_open)
+                        let pr = profit (Hashtbl.find name_to_valve next) (time + to_go) in
+                        let sub_res = impl next next_time (ValveSet.remove next left) in
+                        Some (pr + sub_res)
+                ) |> List.fold_left (max) 0
             in
             Hashtbl.add cache cache_key computed_val;
             computed_val
     in
-    impl "AA" ValveSet.empty 1
+    impl "AA" 1 (ValveSet.of_list good_valve_names)
 
 let solve_easy = Printf.printf "easy: %d\n" best_pressure
