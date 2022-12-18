@@ -65,33 +65,60 @@ let valve_dist =
 let minutes = 30
 
 (* What do we get if the valve is opened for all t > time? *)
-let profit valve time =
+let profit rate time =
     assert (time <= minutes);
-    valve.Valve.flow_rate * (minutes - time)
+    rate * (minutes - time)
+
+let is_bit_set n i = (n land (1 lsl i)) <> 0
+let remove_bit n i = n land (lnot (1 lsl i))
 
 let best_pressure =
-    let cache = Hashtbl.create 0 in
+    let name_arr = Array.of_list ("AA" :: good_valve_names) in
+    let n = Array.length name_arr in
+    let rate_arr = Array.init n (fun i ->
+        let v = Hashtbl.find name_to_valve name_arr.(i) in
+        v.Valve.flow_rate
+    ) in
+    let dist_arr = Array.init n (fun i ->
+        Array.init n (fun j ->
+            let iv = Hashtbl.find name_to_valve name_arr.(i) in
+            let jv = Hashtbl.find name_to_valve name_arr.(j) in
+            Hashtbl.find valve_dist (iv.Valve.name, jv.Valve.name)
+        )
+    )
+    in
+    let cache = Array.init n (fun _ ->
+        Array.init (minutes + 1) (fun _ ->
+            Array.init (Int.shift_left 1 n) (fun _ ->
+                None
+            )
+        )
+    )
+    in
     let rec impl cur time left =
-        let cache_key = (cur, time, left) in
-        match Hashtbl.find_opt cache cache_key with
+        match cache.(cur).(time).(left) with
         | Some v -> v
         | None ->
-            let computed_val =
-                left |> ValveSet.to_seq |> List.of_seq |> List.filter_map (function next ->
-                    let to_go = Hashtbl.find valve_dist (cur, next) in
+            let res = ref 0 in
+            for i = 0 to n - 1 do
+                if (i <> cur) && (is_bit_set left i)
+                then
+                begin
+                    let to_go = dist_arr.(cur).(i) in
                     let next_time = time + to_go + 1 in
-                    if next = cur || next_time > minutes
+                    if next_time <= minutes
                     then
-                        None
-                    else
-                        let pr = profit (Hashtbl.find name_to_valve next) (time + to_go) in
-                        let sub_res = impl next next_time (ValveSet.remove next left) in
-                        Some (pr + sub_res)
-                ) |> List.fold_left (max) 0
-            in
-            Hashtbl.add cache cache_key computed_val;
-            computed_val
+                        let pr = profit rate_arr.(i) (time + to_go) in
+                        let sub_res = impl i next_time (remove_bit left i) in
+                        let cand = pr + sub_res in
+                        if cand > !res
+                        then
+                            res := cand
+                end
+            done;
+            cache.(cur).(time).(left) <- Some !res;
+            !res
     in
-    impl "AA" 1 (ValveSet.of_list good_valve_names)
+    impl 0 1 ((1 lsl n) - 2)
 
 let solve_easy = Printf.printf "easy: %d\n" best_pressure
