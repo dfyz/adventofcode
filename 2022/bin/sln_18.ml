@@ -11,23 +11,54 @@ let input =
             | _ -> failwith "Invalid cube"
     ) |> Locs.of_list
 
-let exposed_sides (x, y, z) locs =
-    let deltas = [
-        (1, 0, 0);
-        (-1, 0, 0);
-        (0, 1, 0);
-        (0, -1, 0);
-        (0, 0, 1);
-        (0, 0, -1);
-    ] in
+let deltas = [
+    (1, 0, 0);
+    (-1, 0, 0);
+    (0, 1, 0);
+    (0, -1, 0);
+    (0, 0, 1);
+    (0, 0, -1);
+]
+
+let get_adj (x, y, z) =
     deltas |> List.map (fun (dx, dy, dz) ->
-        let adj = (x + dx, y + dy, z + dz) in
-        if Locs.mem adj locs then 0 else 1
-    ) |> List.fold_left (+) 0
+        (x + dx, y + dy, z + dz)
+    )
+
+let count_adj is_good_adj =
+    input
+        |> Locs.to_seq |> List.of_seq
+        |> List.concat_map (fun pos ->
+            get_adj pos |> List.map (fun adj ->
+                if is_good_adj adj then 1 else 0
+            )
+        )
+        |> List.fold_left (+) 0
 
 let solve_easy =
-    let ans = input |> Locs.to_seq |> List.of_seq
-        |> List.map (fun cube -> exposed_sides cube input)
-        |> List.fold_left (+) 0
-    in
+    let ans = count_adj (fun adj -> not (Locs.mem adj input)) in
     Printf.printf "easy: %d\n" ans
+
+let hull =
+    let (min_bound, max_bound) = (-1, 25) in
+    let visited = Hashtbl.create 0 in
+    let rec dfs cur =
+        let adj = get_adj cur in
+        let good_adj = adj |> List.filter (fun ((x, y, z) as next) ->
+            (x >= min_bound && y >= min_bound && z >= min_bound) &&
+            (x <= max_bound && y <= max_bound && z <= max_bound) &&
+            not (Locs.mem next input)
+        ) in
+        Hashtbl.add visited cur true;
+        good_adj |> List.iter (fun next ->
+            match Hashtbl.find_opt visited next with
+            | None -> dfs next
+            | _ -> ()
+        )
+    in
+    dfs (min_bound, min_bound, min_bound);
+    visited |> Hashtbl.to_seq_keys |> Locs.of_seq
+
+let solve_hard =
+    let ans = count_adj (fun adj -> Locs.mem adj hull) in
+    Printf.printf "hard: %d\n" ans
