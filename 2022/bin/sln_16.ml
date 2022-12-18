@@ -62,19 +62,19 @@ let valve_dist =
     );
     dist
 
-let minutes = 30
+let name_arr = Array.of_list ("AA" :: good_valve_names)
+let n = Array.length name_arr
+let universe = (1 lsl n) - 2 (* we need everything but AA, hence -2 *)
 
 (* What do we get if the valve is opened for all t > time? *)
-let profit rate time =
+let profit rate time minutes =
     assert (time <= minutes);
     rate * (minutes - time)
 
 let is_bit_set n i = (n land (1 lsl i)) <> 0
 let remove_bit n i = n land (lnot (1 lsl i))
 
-let best_pressure =
-    let name_arr = Array.of_list ("AA" :: good_valve_names) in
-    let n = Array.length name_arr in
+let pressure_cache minutes =
     let rate_arr = Array.init n (fun i ->
         let v = Hashtbl.find name_to_valve name_arr.(i) in
         v.Valve.flow_rate
@@ -108,7 +108,7 @@ let best_pressure =
                     let next_time = time + to_go + 1 in
                     if next_time <= minutes
                     then
-                        let pr = profit rate_arr.(i) (time + to_go) in
+                        let pr = profit rate_arr.(i) (time + to_go) minutes in
                         let sub_res = impl i next_time (remove_bit left i) in
                         let cand = pr + sub_res in
                         if cand > !res
@@ -119,6 +119,30 @@ let best_pressure =
             cache.(cur).(time).(left) <- Some !res;
             !res
     in
-    impl 0 1 ((1 lsl n) - 2)
+    for i = 0 to universe do
+        let _ = impl 0 1 i in ()
+    done;
+    cache
 
-let solve_easy = Printf.printf "easy: %d\n" best_pressure
+let cache_by_mask cache mask = cache.(0).(1).(mask)
+
+let solve_easy =
+    let cache = pressure_cache 30 in
+    let ans = Option.get (cache_by_mask cache universe) in
+    Printf.printf "easy: %d\n" ans
+
+let solve_hard =
+    let cache = pressure_cache 26 in
+    let ans = ref 0 in
+    for i = 0 to universe
+    do
+        let complement = universe land (lnot i) in
+        match (cache_by_mask cache i, cache_by_mask cache complement) with
+        | (Some a, Some b) ->
+            let cand_ans = a + b in
+            if cand_ans > !ans
+            then
+                ans := cand_ans
+        | _ -> ()
+    done;
+    Printf.printf "hard: %d\n" !ans
