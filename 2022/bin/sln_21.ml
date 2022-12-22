@@ -37,10 +37,12 @@ let input =
         );
     instructions
 
-let solve_easy =
+let eval human_val =
     let rec impl monkey =
         match Hashtbl.find input monkey with
-        | Yell num -> num
+        | Yell num -> (match (monkey, human_val) with
+            | ("humn", Some x) -> x
+            | _ -> num)
         | Combine (monkey1, op, monkey2) ->
             let res1 = impl monkey1 in
             let res2 = impl monkey2 in
@@ -51,3 +53,6 @@ let solve_easy =
                 | Div -> assert (res1 mod res2 = 0); res1 / res2
     in
     impl "root"
+
+let solve_easy =
+    Printf.printf "easy: %d\n" (eval None)
