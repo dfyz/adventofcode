@@ -71,16 +71,22 @@ let move_elves locs dir_idx =
         | None -> cur_locs
     ) proposals locs
 
-let solve_easy =
+let iterate should_stop =
     let rec do_round round locs =
-        if round >= 10
-        then locs
-        else
-            let moved = move_elves locs (round mod dir_cnt) in
-            do_round (round + 1) moved
+        let moved = move_elves locs (round mod dir_cnt) in
+        if should_stop round locs moved
+        then (round, locs)
+        else do_round (round + 1) moved
     in
-    let final = do_round 0 input in
+    do_round 0 input
+
+let solve_easy =
+    let (_, final) = iterate (fun r _ _ -> r >= 10) in
     let (min_row, max_row, min_col, max_col) = bounding_box final in
     let area = (max_row - min_row + 1) * (max_col - min_col + 1) in
     let ans = area - (Locs.cardinal final) in
     Printf.printf "easy: %d\n" ans
+
+let solve_hard =
+    let (round, _) = iterate (fun _ cur next -> cur = next) in
+    Printf.printf "hard: %d\n" (round + 1)
