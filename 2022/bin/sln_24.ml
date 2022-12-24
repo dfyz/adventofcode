@@ -74,7 +74,18 @@ let move_locs locs =
         chs |> List.map (fun ch -> (move pos ch, ch))
     ) |> locs_of_list
 
-let solve_easy =
+type leg =
+| Initial
+| Intermediate
+| Final
+
+let next_leg cur_leg next_pos =
+    match (cur_leg, next_pos) with
+    | (Initial, x) when x = finish_pos -> Intermediate
+    | (Intermediate, x) when x = start_pos -> Final
+    | _ -> cur_leg
+
+let solve is_easy =
     let locs_cache = Hashtbl.create 0 in
     Hashtbl.add locs_cache 0 input;
     let time_to_locs t =
@@ -89,7 +100,7 @@ let solve_easy =
     let q = Queue.create () in
     let dist = Hashtbl.create 0 in
 
-    let push_elem ((elem_dist, pos) as elem) =
+    let push_elem ((_, elem_dist, _) as elem) =
         Queue.push elem q;
         Hashtbl.add dist elem elem_dist
     in
@@ -97,15 +108,15 @@ let solve_easy =
     let rec bfs () =
         match Queue.take_opt q with
         | None -> failwith "No path to finish"
-        | Some (t, pos) when pos = finish_pos -> t
-        | Some (t, (r, c)) ->
+        | Some (Final, t, pos) when pos = finish_pos -> t
+        | Some (leg, t, (r, c)) ->
             let next_field = time_to_locs (t + 1) in
-            let can_move ((next_time, ((nr, nc) as next_pos)) as next_elem) =
+            let can_move ((_, next_time, ((nr, nc) as next_pos)) as next_elem) =
                 not (Locs.mem next_pos next_field)
                 && not (Hashtbl.mem dist next_elem)
                 && (
                     ((nr > 0) && (nc > 0) && (nr <= rows) && (nc <= cols))
-                    || next_pos = finish_pos
+                    || next_pos = finish_pos || next_pos = start_pos
                 )
             in
             let adj = [
@@ -115,7 +126,9 @@ let solve_easy =
                 (r, c + 1);
                 (r, c - 1);
             ]
-                |> List.map (fun pos -> (t + 1, pos))
+                |> List.map (fun pos ->
+                    (next_leg leg pos, t + 1, pos)
+                )
                 |> List.filter can_move
             in
             List.iter push_elem adj;
@@ -123,6 +136,9 @@ let solve_easy =
 
     in
 
-    push_elem (0, start_pos);
-    let ans = bfs () in
-    Printf.printf "easy: %d\n" ans
+    push_elem ((if is_easy then Final else Initial), 0, start_pos);
+    bfs ()
+
+let _ =
+    Printf.printf "easy: %d\n" (solve true);
+    Printf.printf "hard: %d\n" (solve false)
