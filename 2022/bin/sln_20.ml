@@ -11,6 +11,12 @@ let find_pos nums num_id =
     in
     impl 0
 
+let safe_mod x y =
+    let ans = x mod y in
+    if ans < 0
+    then ans + y
+    else ans
+
 let move nums num_id =
     let n = Array.length nums in
     let (x, num_id, delta) = find_pos nums num_id in
@@ -22,8 +28,8 @@ let move nums num_id =
     in
     let new_pos =
         if delta >= 0
-        then (x + delta) mod n1
-        else ((((x - 1) + delta + 2*n1) mod n1) + 1) mod n
+        then safe_mod (x + delta) n1
+        else safe_mod ((safe_mod (x - 1 + delta) n1) + 1) n
     in
     let lhs = Array.sub aux 0 new_pos in
     let rhs = Array.sub aux new_pos (n1 - new_pos) in
