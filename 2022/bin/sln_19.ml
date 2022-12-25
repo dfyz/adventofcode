@@ -72,6 +72,26 @@ let input =
 
 let minutes = 24
 
+let local_geodes time res robots =
+    let time_left = minutes - time + 1 in
+    res.Minerals.geode + robots.Minerals.geode * time_left
+
+let try_buy_robot time resources cost robots robo_delta =
+    let rec impl time resources =
+        if time > minutes
+        then None
+        else begin
+            match spend_minerals resources cost with
+            | Some after_robot ->
+                let new_robots = collect_minerals robots robo_delta in
+                let new_resources = collect_minerals after_robot robots in
+                Some (time + 1, new_resources, new_robots)
+            | None ->
+                let new_resources = collect_minerals resources robots in
+                impl (time + 1) new_resources
+        end
+    in impl time resources
+
 let blueprint_profit blueprint =
     let cache = Hashtbl.create 0 in
     let rec impl ((time, resources, robots) as key) =
@@ -79,39 +99,29 @@ let blueprint_profit blueprint =
     match Hashtbl.find_opt cache key with
         | Some v -> v
         | None -> let computed =
+            let local_profit = local_geodes time resources robots in
             if time > minutes
             then
-                resources.Minerals.geode
+                local_profit
             else
-                [
-                    (Some resources, robots);
-                    (spend_minerals resources blueprint.Blueprint.geode, {
-                        robots with Minerals.geode = robots.Minerals.geode + 1;
+                let after_robot_profit = [
+                    (blueprint.Blueprint.geode, {
+                        Minerals.zero with geode = 1;
                     });
-                    (spend_minerals resources blueprint.obsidian, {
-                        robots with obsidian = robots.obsidian + 1;
+                    (blueprint.Blueprint.obsidian, {
+                        Minerals.zero with obsidian = 1;
                     });
-                    (spend_minerals resources blueprint.clay, {
-                        robots with clay = robots.clay + 1;
+                    (blueprint.Blueprint.clay, {
+                        Minerals.zero with clay = 1;
                     });
-                    (spend_minerals resources blueprint.ore, {
-                        robots with ore = robots.ore + 1;
+                    (blueprint.Blueprint.ore, {
+                        Minerals.zero with ore = 1;
                     });
-                ] |> List.filter_map (fun (new_res, new_robots) -> match new_res with
-                    | Some res ->
-                        let after_collection = collect_minerals res robots in
-                        (*
-                            wow
-                            such heuristics
-                            very machine learning
-                        *)
-                        if after_collection.ore > 15
-                        then
-                            None
-                        else
-                            Some (impl (time + 1, after_collection, new_robots))
-                    | None -> None
-                ) |> List.fold_left (max) 0
+                ] |> List.filter_map (fun (cost, robo_delta) ->
+                    try_buy_robot time resources cost robots robo_delta
+                ) |> List.map impl |> List.fold_left (max) 0
+                in
+                max local_profit after_robot_profit
             in
             Hashtbl.add cache key computed;
             computed
