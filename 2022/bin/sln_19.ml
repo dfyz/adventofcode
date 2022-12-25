@@ -156,8 +156,8 @@ let solve_hard =
     let ans = match input with
     | a :: b :: c :: _ ->
         [a; b; c] |> List.map (fun bp ->
-        blueprint_profit bp minutes false
-    ) |> List.fold_left ( * ) 1
+            blueprint_profit bp minutes false
+        ) |> List.fold_left ( * ) 1
     | _ -> failwith "Huh"
     in
     Printf.printf "hard: %d\n" ans
