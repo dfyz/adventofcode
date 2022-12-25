@@ -3,6 +3,8 @@ let input =
         |> List.mapi (fun i x -> (i, int_of_string x))
         |> Array.of_list
 
+let dec_key = 811589153
+
 let find_pos nums num_id =
     let rec impl i =
         match nums.(i) with
@@ -45,15 +47,26 @@ let mix nums =
     in
     impl 0 nums
 
-let solve_easy =
-    let rec find_zero_id i = match input.(i) with
+let solve nums rounds =
+    let rec find_zero_id i = match nums.(i) with
     | (num_id, 0) -> num_id
     | _ -> find_zero_id (i + 1)
     in
     let zero_id = find_zero_id 0 in
-    let mixed = mix input in
+    let rec mix_impl acc rem_rounds =
+        if rem_rounds = 0
+        then acc
+        else mix_impl (mix acc) (rem_rounds - 1)
+    in
+    let mixed = mix_impl nums rounds in
     let (zero_pos, _, _) = find_pos mixed zero_id in
     let n = Array.length mixed in
     let get_num delta = mixed.((zero_pos + delta) mod n) |> snd in
-    let ans = get_num 1000 + get_num 2000 + get_num 3000 in
-    Printf.printf "easy: %d\n" ans
+    get_num 1000 + get_num 2000 + get_num 3000
+
+let solve_easy =
+    Printf.printf "easy: %d\n" (solve input 1)
+
+let solve_hard =
+    let decrypted = input |> Array.map (fun (i, x) -> (i, x * dec_key)) in
+    Printf.printf "hard: %d\n" (solve decrypted 10)
