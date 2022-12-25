@@ -70,32 +70,31 @@ let input =
         }
         | _ -> failwith "Invalid line")
 
-let minutes = 24
+let blueprint_profit blueprint minutes is_easy =
+    let local_geodes time res robots =
+        let time_left = minutes - time + 1 in
+        res.Minerals.geode + robots.Minerals.geode * time_left
+    in
 
-let local_geodes time res robots =
-    let time_left = minutes - time + 1 in
-    res.Minerals.geode + robots.Minerals.geode * time_left
+    let try_buy_robot time resources cost robots robo_delta =
+        let rec impl time resources =
+            if time > minutes
+            then None
+            else begin
+                match spend_minerals resources cost with
+                | Some after_robot ->
+                    let new_robots = collect_minerals robots robo_delta in
+                    let new_resources = collect_minerals after_robot robots in
+                    Some (time + 1, new_resources, new_robots)
+                | None ->
+                    let new_resources = collect_minerals resources robots in
+                    impl (time + 1) new_resources
+            end
+        in impl time resources
+    in
 
-let try_buy_robot time resources cost robots robo_delta =
-    let rec impl time resources =
-        if time > minutes
-        then None
-        else begin
-            match spend_minerals resources cost with
-            | Some after_robot ->
-                let new_robots = collect_minerals robots robo_delta in
-                let new_resources = collect_minerals after_robot robots in
-                Some (time + 1, new_resources, new_robots)
-            | None ->
-                let new_resources = collect_minerals resources robots in
-                impl (time + 1) new_resources
-        end
-    in impl time resources
-
-let blueprint_profit blueprint =
     let cache = Hashtbl.create 0 in
     let rec impl ((time, resources, robots) as key) =
-    (* Printf.printf "time=%d, resources=%s, robots=%s\n" time (Minerals.to_str resources) (Minerals.to_str robots); *)
     match Hashtbl.find_opt cache key with
         | Some v -> v
         | None -> let computed =
@@ -104,20 +103,34 @@ let blueprint_profit blueprint =
             then
                 local_profit
             else
-                let after_robot_profit = [
+                let pre_cands = [
                     (blueprint.Blueprint.geode, {
                         Minerals.zero with geode = 1;
                     });
                     (blueprint.Blueprint.obsidian, {
                         Minerals.zero with obsidian = 1;
                     });
-                    (blueprint.Blueprint.clay, {
-                        Minerals.zero with clay = 1;
-                    });
-                    (blueprint.Blueprint.ore, {
-                        Minerals.zero with ore = 1;
-                    });
-                ] |> List.filter_map (fun (cost, robo_delta) ->
+                ]
+                in
+                let cands_with_clay =
+                    pre_cands @
+                    (if is_easy || robots.Minerals.clay < 9
+                    then
+                        [(blueprint.Blueprint.clay, {
+                            Minerals.zero with clay = 1;
+                        })]
+                    else [])
+                in
+                let cands =
+                    cands_with_clay @
+                    (if is_easy || robots.Minerals.ore < 5
+                    then
+                        [(blueprint.Blueprint.ore, {
+                            Minerals.zero with ore = 1;
+                        })]
+                    else [])
+                in
+                let after_robot_profit = cands |> List.filter_map (fun (cost, robo_delta) ->
                     try_buy_robot time resources cost robots robo_delta
                 ) |> List.map impl |> List.fold_left (max) 0
                 in
@@ -128,12 +141,23 @@ let blueprint_profit blueprint =
     in
     impl (1, Minerals.zero, { Minerals.zero with ore = 1; })
 
-let _ =
-    let ans = ref 0 in
-    input |> List.iteri (fun i bp ->
-        let profit = blueprint_profit bp in
-        Printf.printf "#%d: %d\n" (i + 1) profit;
-        ans := !ans + profit * (i + 1);
-        flush_all ()
-    );
-    Printf.printf "easy: %d\n" !ans
+let solve_easy =
+    let minutes = 24 in
+    let ans = input |> List.mapi (fun i bp ->
+        let profit = blueprint_profit bp minutes true
+        in
+        profit * (i + 1)
+    ) |> List.fold_left (+) 0
+    in
+    Printf.printf "easy: %d\n" ans
+
+let solve_hard =
+    let minutes = 32 in
+    let ans = match input with
+    | a :: b :: c :: _ ->
+        [a; b; c] |> List.map (fun bp ->
+        blueprint_profit bp minutes false
+    ) |> List.fold_left ( * ) 1
+    | _ -> failwith "Huh"
+    in
+    Printf.printf "hard: %d\n" ans
