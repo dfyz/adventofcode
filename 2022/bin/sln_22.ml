@@ -136,58 +136,7 @@ let teleports =
 
     res
 
-let solve_easy =
-    let find_adj ((row, col) as start) delta =
-        let rec impl ((cand_r, cand_c) as cand) =
-            match field.(cand_r).(cand_c) with
-                | '#' -> None
-                | '.' -> Some cand
-                | ' ' -> impl (move_pos cand delta)
-                | _ -> failwith "Oh no"
-        in
-        impl (move_pos start delta)
-    in
-    let move ((row, col) as pos, dir_idx) act =
-        match act with
-            | Rotate RotateLeft ->
-                let new_dir_idx = safe_inc_mod dir_idx (-1) dir_cnt in
-                (pos, new_dir_idx)
-            | Rotate RotateRight ->
-                let new_dir_idx = safe_inc_mod dir_idx 1 dir_cnt in
-                (pos, new_dir_idx)
-            | Move cnt ->
-                let dir = dirs.(dir_idx) in
-                let rec step rem_cnt pos =
-                    if rem_cnt = 0
-                    then pos
-                    else
-                        let next_pos_cand = find_adj pos dir in
-                        let next_pos = Option.value next_pos_cand ~default:pos in
-                        step (rem_cnt - 1) next_pos
-                in
-                (step cnt pos, dir_idx)
-    in
-    let ((final_row, final_col), dir_idx) = List.fold_left move ((0, start_col), 0) path
-    in
-    let ans = 1000 * (final_row + 1) + 4 * (final_col + 1) + dir_idx
-    in
-    Printf.printf "easy: %d\n" ans
-
-let solve_hard =
-    let find_adj ((row, col) as start) dir_idx =
-        let dir = dirs.(dir_idx) in
-        let ((next_r, next_c) as next_pos) = move_pos start dir in
-        match field.(next_r).(next_c) with
-        | ' ' ->
-            let ((next_r, next_c), _) as next_state = Hashtbl.find teleports (dir_idx, start) in
-            (match field.(next_r).(next_c) with
-            | '#' -> None
-            | '.' -> Some next_state
-            | _ -> failwith "Whoa")
-        | '#' -> None
-        | '.' -> Some (next_pos, dir_idx)
-        | _ -> failwith "Oh no"
-    in
+let solve find_adj =
     let move ((row, col) as pos, dir_idx) act =
         match act with
             | Rotate RotateLeft ->
@@ -209,6 +158,37 @@ let solve_hard =
     in
     let ((final_row, final_col), dir_idx) = List.fold_left move ((0, start_col), 0) path
     in
-    let ans = 1000 * (final_row + 1) + 4 * (final_col + 1) + dir_idx
+    1000 * (final_row + 1) + 4 * (final_col + 1) + dir_idx
+
+let solve_easy =
+    let find_adj ((row, col) as start) dir_idx =
+        let dir = dirs.(dir_idx) in
+        let rec impl ((cand_r, cand_c) as cand) =
+            match field.(cand_r).(cand_c) with
+                | '#' -> None
+                | '.' -> Some (cand, dir_idx)
+                | ' ' -> impl (move_pos cand dir)
+                | _ -> failwith "Oh no"
+        in
+        impl (move_pos start dir)
     in
+    let ans = solve find_adj in
+    Printf.printf "easy: %d\n" ans
+
+let solve_hard =
+    let find_adj ((row, col) as start) dir_idx =
+        let dir = dirs.(dir_idx) in
+        let ((next_r, next_c) as next_pos) = move_pos start dir in
+        match field.(next_r).(next_c) with
+        | ' ' ->
+            let ((next_r, next_c), _) as next_state = Hashtbl.find teleports (dir_idx, start) in
+            (match field.(next_r).(next_c) with
+            | '#' -> None
+            | '.' -> Some next_state
+            | _ -> failwith "Whoa")
+        | '#' -> None
+        | '.' -> Some (next_pos, dir_idx)
+        | _ -> failwith "Oh no"
+    in
+    let ans = solve find_adj in
     Printf.printf "hard: %d\n" ans
