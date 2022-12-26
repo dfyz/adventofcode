@@ -63,15 +63,46 @@ let drop_n_rocks n =
     let rec impl n rock_idx jet_idx chamber =
         if n = 0
         then
-            chamber
+            []
         else
             let rock = List.nth rocks (rock_idx mod (List.length rocks)) in
             let (next_jet_idx, next_chamber) = drop_rock chamber rock jet_idx in
-            impl (n - 1) (rock_idx + 1) next_jet_idx next_chamber
+            let delta = (max_y next_chamber - max_y chamber) in
+            delta :: impl (n - 1) (rock_idx + 1) next_jet_idx next_chamber
     in
     impl n 0 0 Locs.empty
 
+let rocks_5k = drop_n_rocks 5000
+
+let rec take_n n lst =
+    let rec impl cnt acc lst =
+        if cnt >= n
+            then (List.rev acc, lst)
+            else impl (cnt + 1) ((List.hd lst) :: acc) (List.tl lst)
+    in
+    impl 0 [] lst
+
+let sum_list = List.fold_left (+) 0
+
 let solve_easy =
-    let chamber = drop_n_rocks 2022 in
-    let ans = max_y chamber in
+    let ans = take_n 2022 rocks_5k |> fst |> sum_list in
     Printf.printf "easy: %d\n" ans
+
+let solve_hard =
+    (* These values were found by eyeballing `rocks_5k` in Sublime Text lmao. *)
+    let prefix_len = 632 in
+    let cycle_len = 1705 in
+
+    let target = 1000000000000 in
+
+    let target_without_prefix_len = target - prefix_len in
+    let cycle_prefix_len = target_without_prefix_len mod cycle_len in
+
+    let (prefix, suffix) = take_n prefix_len rocks_5k in
+    let (cycle, _) = take_n cycle_len suffix in
+    let (cycle_prefix, _) = take_n cycle_prefix_len cycle in
+
+    let ans = (target_without_prefix_len / cycle_len * (sum_list cycle)) +
+              (sum_list prefix) +
+              (sum_list cycle_prefix) in
+    Printf.printf "hard: %d\n" ans
