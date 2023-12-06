@@ -23,6 +23,8 @@ func ParseSegment(line string) Segment {
 	return res
 }
 
+const SENTINEL = math.MaxUint64
+
 func main() {
 	lines := common.ReadLines("05/input.txt")
 
@@ -64,7 +66,7 @@ func main() {
 	easy := slices.Min(easySeeds)
 	fmt.Printf("easy: %d\n", easy)
 
-	hard := uint64(math.MaxUint64)
+	hard := uint64(SENTINEL)
 	for ii := 0; ii < len(seeds); ii += 2 {
 		start, length := seeds[ii], seeds[ii+1]
 		hard = min(hard, checkHard(start, start+length, maps))
@@ -73,20 +75,31 @@ func main() {
 }
 
 func checkHard(start uint64, end uint64, maps [][]Segment) uint64 {
-	res := uint64(math.MaxUint64)
+	res := uint64(SENTINEL)
 	for start < end {
 		cur := start
-		delta := uint64(math.MaxUint64)
+		delta := uint64(SENTINEL)
 		for _, m := range maps {
 			for _, seg := range m {
+				// A) If we are inside a mapping, map the current point, update the delta, and move on.
 				if cur >= seg.src && cur < seg.src+seg.len {
 					delta = min(delta, seg.src+seg.len-cur)
 					cur = seg.dst + (cur - seg.src)
 					break
+				} else if cur < seg.src {
+					// B) If we are not inside a mapping, move to the nearest mapping start.
+					// Note that an update from A) will necessarily be smaller that any of the B) updates.
+					// This means that, for simplicity, we can update `delta` here unconditionally.
+					delta = min(delta, seg.src-cur)
 				}
 			}
 		}
 		res = min(res, cur)
+		if delta == SENTINEL {
+			// Happens when `start` is located strictly to the right of all mappings.
+			// This means the result can't get any smaller, so we should bail out.
+			break
+		}
 		start += delta
 	}
 	return res
