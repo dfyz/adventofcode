@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func ReadLines(fileName string) []string {
@@ -19,4 +21,17 @@ func ReadLines(fileName string) []string {
 		res = append(res, sc.Text())
 	}
 	return res
+}
+
+func ParseInts(line string) []int {
+	rawNums := strings.Fields(line)
+	nums := make([]int, len(rawNums))
+	for ii, rawVal := range rawNums {
+		num, err := strconv.Atoi(rawVal)
+		if err != nil {
+			log.Fatal(err)
+		}
+		nums[ii] = num
+	}
+	return nums
 }
