@@ -53,6 +53,10 @@ func getStartPos(lines []string, rows int, cols int) P {
 	panic("No S on the map")
 }
 
+func isValidPos(p P, rows, cols int) bool {
+	return p.X >= 0 && p.Y >= 0 && p.X < cols && p.Y < rows
+}
+
 func main() {
 	adjMap := getAdjMap()
 	lines := common.ReadLines("10/input.txt")
@@ -62,7 +66,27 @@ func main() {
 	visited := make(map[P]bool)
 	pathLen := 0
 
-	lines[curPos.Y] = strings.Replace(lines[curPos.Y], "S", "F", -1)
+	var foundStart string
+	for k, v := range adjMap {
+		conns := 0
+		for ii, dd := range deltas {
+			nextPos := curPos.Add(dd)
+			if !isValidPos(nextPos, rows, cols) {
+				continue
+			}
+			nextCh := rune(lines[nextPos.Y][nextPos.X])
+			if v[ii] && adjMap[nextCh][inv(ii)] {
+				conns++
+			}
+		}
+		if conns == 2 {
+			foundStart = string(k)
+			break
+		}
+	}
+
+	common.Ensure(foundStart != "", "Failed to find the start symbol")
+	lines[curPos.Y] = strings.Replace(lines[curPos.Y], "S", foundStart, -1)
 
 	for {
 		visited[curPos] = true
@@ -72,14 +96,11 @@ func main() {
 			if !adjMap[ch][ii] {
 				continue
 			}
-			nextPos := P{
-				curPos.X + dd.X,
-				curPos.Y + dd.Y,
-			}
+			nextPos := curPos.Add(dd)
 			if _, ok := visited[nextPos]; ok {
 				continue
 			}
-			if nextPos.X < 0 || nextPos.Y < 0 || nextPos.X >= cols || nextPos.Y >= rows {
+			if !isValidPos(nextPos, rows, cols) {
 				continue
 			}
 			nextCh := rune(lines[nextPos.Y][nextPos.X])
