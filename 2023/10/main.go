@@ -118,4 +118,58 @@ func main() {
 
 	common.Ensure(pathLen%2 != 0, fmt.Sprintf("even pathLen: %d", pathLen))
 	fmt.Printf("easy: %d\n", (pathLen+1)/2)
+
+	megaRows, megaCols := rows*3, cols*3
+	megaLines := make([][]bool, megaRows)
+	for rr := 0; rr < megaRows; rr++ {
+		megaLines[rr] = make([]bool, megaCols)
+	}
+	for rr := 0; rr < rows; rr++ {
+		for cc := 0; cc < cols; cc++ {
+			rrMiddle, ccMiddle := rr*3+1, cc*3+1
+			ch := lines[rr][cc]
+			if visited[P{cc, rr}] {
+				megaLines[rrMiddle][ccMiddle] = true // always set the middle
+				for ii, isSet := range adjMap[rune(ch)] {
+					if isSet {
+						dd := deltas[ii]
+						megaLines[rrMiddle+dd.Y][ccMiddle+dd.X] = true
+					}
+				}
+			}
+		}
+	}
+
+	var dfs func(start P)
+	dfs = func(start P) {
+		if !isValidPos(start, megaRows, megaCols) {
+			return
+		}
+		if megaLines[start.Y][start.X] {
+			return
+		}
+		megaLines[start.Y][start.X] = true
+		for _, dd := range deltas {
+			dfs(start.Add(dd))
+		}
+	}
+
+	for rr := 0; rr < megaRows; rr++ {
+		dfs(P{0, rr})
+		dfs(P{megaCols - 1, rr})
+	}
+	for cc := 0; cc < megaCols; cc++ {
+		dfs(P{cc, 0})
+		dfs(P{cc, megaRows - 1})
+	}
+
+	hard := 0
+	for rr := 0; rr < rows; rr++ {
+		for cc := 0; cc < cols; cc++ {
+			if !visited[P{cc, rr}] && !megaLines[rr*3][cc*3] {
+				hard++
+			}
+		}
+	}
+	fmt.Printf("hard: %d\n", hard)
 }
