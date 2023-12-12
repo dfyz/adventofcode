@@ -26,9 +26,15 @@ func countWays(springs string, groups []int) int {
 
 	// Exactly one way to get no symbols and no groups
 	dp[0][0] = 1
+	numDamaged := 0
 
 	for ss := 1; ss <= S; ss++ {
 		ch := rune(springs[ss-1])
+		if ch == '.' {
+			numDamaged = 0
+		} else {
+			numDamaged++
+		}
 		// Baseline: we get exactly as many groups as we had at the previous position.
 		if canBeOperational(ch) {
 			for gg := 0; gg <= G; gg++ {
@@ -42,11 +48,7 @@ func countWays(springs string, groups []int) int {
 				if ss < cnt {
 					continue
 				}
-				goodGroup := true
-				for delta := 0; goodGroup && delta < cnt; delta++ {
-					goodGroup = goodGroup && canBeDamaged(rune(springs[ss-1-delta]))
-				}
-				if !goodGroup {
+				if numDamaged < cnt {
 					continue
 				}
 				dpIdx := ss - cnt
