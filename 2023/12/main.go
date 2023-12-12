@@ -45,20 +45,17 @@ func countWays(springs string, groups []int) int {
 			// This can be a damaged spring. Try to place it in all possible groups.
 			for gg := 1; gg <= G; gg++ {
 				cnt := groups[gg-1]
-				if ss < cnt {
-					continue
-				}
-				if numDamaged < cnt {
+				if ss < cnt || numDamaged < cnt {
 					continue
 				}
 				dpIdx := ss - cnt
-				switch {
-				case ss == cnt:
-					// We are exactly at the start of the string, do nothing.
-				case canBeOperational(rune(springs[ss-1-cnt])):
-					dpIdx--
-				default:
+				if dpIdx < 0 {
 					continue
+				} else if dpIdx > 0 {
+					if !canBeOperational(rune(springs[ss-1-cnt])) {
+						continue
+					}
+					dpIdx--
 				}
 				// We move to the left by `cnt` damaged springs and possibly one operational spring.
 				// And we also decrease the number of groups by one.
