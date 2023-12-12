@@ -64,23 +64,42 @@ func countWays(springs string, groups []int) int {
 			}
 		}
 	}
+
 	return dp[S][G]
+}
+
+func multiply(orig, sep string, mulFactor int) string {
+	blownUp := make([]string, mulFactor)
+	for ii := 0; ii < mulFactor; ii++ {
+		blownUp[ii] = orig
+	}
+	return strings.Join(blownUp, sep)
+}
+
+func solveLine(line string, mulFactor int) int {
+	tokens := strings.Split(line, " ")
+
+	tokens[0] = multiply(tokens[0], "?", mulFactor)
+	tokens[1] = multiply(tokens[1], ",", mulFactor)
+
+	groups := make([]int, 0)
+	for _, rawGG := range strings.Split(tokens[1], ",") {
+		gg, err := strconv.Atoi(rawGG)
+		if err != nil {
+			log.Fatal(err)
+		}
+		groups = append(groups, gg)
+	}
+	return countWays(tokens[0], groups)
 }
 
 func main() {
 	lines := common.ReadLines("12/input.txt")
-	easy := 0
+	easy, hard := 0, 0
 	for _, l := range lines {
-		tokens := strings.Split(l, " ")
-		groups := make([]int, 0)
-		for _, rawGG := range strings.Split(tokens[1], ",") {
-			gg, err := strconv.Atoi(rawGG)
-			if err != nil {
-				log.Fatal(err)
-			}
-			groups = append(groups, gg)
-		}
-		easy += countWays(tokens[0], groups)
+		easy += solveLine(l, 1)
+		hard += solveLine(l, 5)
 	}
 	fmt.Printf("easy: %d\n", easy)
+	fmt.Printf("hard: %d\n", hard)
 }
