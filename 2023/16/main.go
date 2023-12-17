@@ -1,47 +1,18 @@
 package main
 
 import (
-	"2023/common"
+	cm "2023/common"
 	"fmt"
-	"image"
 )
 
-const (
-	Right = iota
-	Down
-	Left
-	Up
-)
+func isHoriz(dd int) bool { return dd%2 == 0 }
 
-var Dirs = []P{
-	Right: {1, 0},
-	Down:  {0, 1},
-	Left:  {-1, 0},
-	Up:    {0, -1},
-}
+func countEnergized(board []string, dim int, initial cm.Pos) int {
+	visited, energized := make(map[cm.Pos]bool), make(map[cm.P]bool)
 
-type P = image.Point
-
-type Pos struct {
-	coords P
-	dir    int
-}
-
-func (self *Pos) move(newDir int) Pos {
-	return Pos{self.coords.Add(Dirs[newDir]), newDir}
-}
-
-func rot(dd int, delta int) int { return (dd + delta + len(Dirs)) % len(Dirs) }
-func rotl(dd int) int           { return rot(dd, -1) }
-func rotr(dd int) int           { return rot(dd, 1) }
-func isHoriz(dd int) bool       { return dd%2 == 0 }
-
-func countEnergized(board []string, dim int, initial Pos) int {
-	visited, energized := make(map[Pos]bool), make(map[P]bool)
-
-	var visit func(start Pos)
-	visit = func(start Pos) {
-		cc, dd := start.coords, start.dir
+	var visit func(start cm.Pos)
+	visit = func(start cm.Pos) {
+		cc, dd := start.Coords, start.Dir
 		if cc.X < 0 || cc.Y < 0 || cc.X >= dim || cc.Y >= dim {
 			// Off the grid, bailing out.
 			return
@@ -58,21 +29,21 @@ func countEnergized(board []string, dim int, initial Pos) int {
 		case '|', '-':
 			if (ch == '|') == isHoriz(dd) {
 				// The beam should be split into two beams.
-				visit(start.move(rotl(dd)))
-				visit(start.move(rotr(dd)))
+				visit(start.Move(cm.RotL(dd)))
+				visit(start.Move(cm.RotR(dd)))
 				return
 			}
 		case '/', '\\':
 			if (ch == '/') == isHoriz(dd) {
-				dd = rotl(dd)
+				dd = cm.RotL(dd)
 			} else {
-				dd = rotr(dd)
+				dd = cm.RotR(dd)
 			}
 		default:
-			common.Ensure(ch == '.', fmt.Sprintf("unexpected symbol: %c", ch))
+			cm.Ensure(ch == '.', fmt.Sprintf("unexpected symbol: %c", ch))
 		}
 
-		visit(start.move(dd))
+		visit(start.Move(dd))
 	}
 
 	visit(initial)
@@ -80,20 +51,20 @@ func countEnergized(board []string, dim int, initial Pos) int {
 }
 
 func main() {
-	board := common.ReadLines("16/input.txt")
+	board := cm.ReadLines("16/input.txt")
 	dim := len(board)
-	common.Ensure(dim == len(board[0]), "expected a square board")
+	cm.Ensure(dim == len(board[0]), "expected a square board")
 
-	easy := countEnergized(board, dim, Pos{P{0, 0}, Right})
+	easy := countEnergized(board, dim, cm.Pos{cm.P{0, 0}, cm.Right})
 
 	hard := 0
 	for ii := 0; ii < dim; ii++ {
 		hard = max(
 			hard,
-			countEnergized(board, dim, Pos{P{0, ii}, Right}),
-			countEnergized(board, dim, Pos{P{ii, 0}, Down}),
-			countEnergized(board, dim, Pos{P{dim - 1, ii}, Left}),
-			countEnergized(board, dim, Pos{P{ii, dim - 1}, Up}),
+			countEnergized(board, dim, cm.Pos{cm.P{0, ii}, cm.Right}),
+			countEnergized(board, dim, cm.Pos{cm.P{ii, 0}, cm.Down}),
+			countEnergized(board, dim, cm.Pos{cm.P{dim - 1, ii}, cm.Left}),
+			countEnergized(board, dim, cm.Pos{cm.P{ii, dim - 1}, cm.Up}),
 		)
 	}
 
